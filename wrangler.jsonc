@@ -1,7 +1,7 @@
 {
-  "name": "static-site",
-  "compatibility_date": "2026-01-14",
+  "name": "cms-worker",
+  "compatibility_date": "2026-01-28",
   "assets": {
-    "directory": "./public"
+    "directory": "./"
   }
 }
