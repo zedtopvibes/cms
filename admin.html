@@ -1,91 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMS Admin Dashboard</title>
-<style>
-body { font-family: Arial; margin: 20px; }
-form { margin-bottom: 30px; }
-input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
-button { padding: 5px 10px; }
-#status { margin-top: 10px; color: green; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - ZedTopVibes</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <h2>ZedTopVibes</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="active"><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li><a href="#"><i class="fas fa-music"></i> Posts</a></li>
+      <li><a href="#"><i class="fas fa-file-alt"></i> Drafts</a></li>
+      <li><a href="#"><i class="fas fa-user"></i> Artists</a></li>
+      <li><a href="#"><i class="fas fa-tags"></i> Tags</a></li>
+      <li><a href="#"><i class="fas fa-list"></i> Categories</a></li>
+      <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+    </ul>
+  </aside>
 
-<h2>Admin Login</h2>
-<form id="loginForm">
-  <input type="text" name="username" placeholder="Username" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Login</button>
-</form>
+  <!-- Main Content -->
+  <main id="main-content">
+    <!-- Top Navbar -->
+    <header>
+      <button id="sidebarToggle"><i class="fas fa-bars"></i></button>
+      <div class="admin-info">
+        <img src="assets/placeholder.png" alt="Admin Avatar" class="avatar">
+        <span>Admin</span>
+        <button id="logout"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </header>
 
-<h2>Add New Post</h2>
-<form id="postForm" style="display:none;" enctype="multipart/form-data">
-  <input type="text" name="title" placeholder="Song Title" required />
-  <input type="text" name="artist" placeholder="Artist Name" required />
-  <input type="text" name="slug" placeholder="Slug (unique)" required />
-  <input type="text" name="category" placeholder="Category" required />
-  <input type="text" name="tags" placeholder="Tags (comma separated)" />
-  <textarea name="description" placeholder="Description"></textarea>
-  <input type="file" name="audio" accept="audio/*" required />
-  <input type="file" name="image" accept="image/*" required />
-  <button type="submit">Add Post</button>
-</form>
+    <!-- Dashboard Home -->
+    <section class="dashboard-cards">
+      <div class="card">
+        <h3>Total Posts</h3>
+        <p id="total-posts">0</p>
+      </div>
+      <div class="card">
+        <h3>Drafts</h3>
+        <p id="total-drafts">0</p>
+      </div>
+      <div class="card">
+        <h3>Scheduled Posts</h3>
+        <p id="total-scheduled">0</p>
+      </div>
+      <div class="card">
+        <h3>Total Views</h3>
+        <p id="total-views">0</p>
+      </div>
+    </section>
 
-<div id="status"></div>
+    <!-- Posts Table -->
+    <section class="table-section">
+      <div class="table-header">
+        <h2>Posts</h2>
+        <button id="addPostBtn"><i class="fas fa-plus"></i> Add Post</button>
+      </div>
+      <div class="table-container">
+        <table id="postsTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Artist</th>
+              <th>Status</th>
+              <th>Category</th>
+              <th>Tags</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Posts populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-<script>
-let token = "";
+    <!-- Add/Edit Post Modal -->
+    <div id="postModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">Add Post</h2>
+        <form id="postForm">
+          <input type="text" name="title" placeholder="Title" required>
+          <input type="text" name="artist" placeholder="Artist" required>
+          <input type="text" name="slug" placeholder="Slug" required>
+          <input type="text" name="category" placeholder="Category">
+          <input type="text" name="tags" placeholder="Tags (comma separated)">
+          <textarea name="description" placeholder="Description"></textarea>
+          <label>Audio File:</label>
+          <input type="file" name="audio" accept="audio/*">
+          <label>Image File:</label>
+          <input type="file" name="image" accept="image/*">
+          <select name="status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+            <option value="scheduled">Scheduled</option>
+          </select>
+          <input type="datetime-local" name="scheduled_at">
+          <button type="submit">Save</button>
+        </form>
+      </div>
+    </div>
+  </main>
 
-// ===== Login Form =====
-document.getElementById("loginForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const form = e.target;
-  const data = {
-    username: form.username.value,
-    password: form.password.value
-  };
-
-  const res = await fetch("https://cms.zedtopvibes.workers.dev/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-
-  const result = await res.json();
-  if (result.success) {
-    token = result.token;
-    document.getElementById("status").innerText = "Login successful!";
-    form.style.display = "none";
-    document.getElementById("postForm").style.display = "block";
-  } else {
-    document.getElementById("status").innerText = "Login failed: " + result.message;
-  }
-});
-
-// ===== Add Post Form =====
-document.getElementById("postForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const form = e.target;
-  const formData = new FormData(form);
-
-  const res = await fetch("https://cms.zedtopvibes.workers.dev/posts", {
-    method: "POST",
-    headers: { "Authorization": token },
-    body: formData
-  });
-
-  const result = await res.json();
-  if (result.success) {
-    document.getElementById("status").innerText = "Post added successfully!";
-    form.reset();
-  } else {
-    document.getElementById("status").innerText = "Error: " + result.message;
-  }
-});
-</script>
-
+  <script src="js/script.js"></script>
 </body>
 </html>
