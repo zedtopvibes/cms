@@ -1,8 +1,7 @@
 {
-  "name": "cms-worker",
-  "main": "./index.js", // your Worker script
-  "compatibility_date": "2026-01-28",
+  "name": "static-site",
+  "compatibility_date": "2026-01-14",
   "assets": {
-    "directory": "./admin" // folder containing admin.html + JS/CSS
+    "directory": "./public"
   }
 }
