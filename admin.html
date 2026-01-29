@@ -3,147 +3,183 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMS Admin Dashboard</title>
+<title>ZED CMS Dashboard</title>
 <style>
-  body { font-family: Arial; margin: 20px; }
-  form { margin-bottom: 30px; }
-  input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
-  button { padding: 5px 10px; }
-  #status { margin-top: 10px; color: green; }
-  #totals, #topDownloads { margin-top: 20px; }
+  body { font-family: Arial, sans-serif; margin: 20px; background:#f9f9f9; }
+  .hidden { display:none; }
+  input, button, select, textarea { padding: 8px; margin:5px 0; width:100%; max-width:400px; }
+  .card { border:1px solid #ccc; padding:10px; margin:10px 0; border-radius:5px; background:#fff; }
+  img { max-width:150px; display:block; margin-top:5px; }
+  audio { margin-top:5px; width:100%; }
+  .totals { font-weight:bold; margin:10px 0; }
 </style>
 </head>
 <body>
 
-<h2>Admin Login</h2>
-<form id="loginForm">
-  <input type="text" name="username" placeholder="Username" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Login</button>
-</form>
+<h1>ZED CMS Dashboard</h1>
 
-<h2>Add New Post</h2>
-<form id="postForm" style="display:none;" enctype="multipart/form-data">
-  <input type="text" name="title" placeholder="Song Title" required />
-  <input type="text" name="artist" placeholder="Artist Name" required />
-  <input type="text" name="slug" placeholder="Slug (unique)" required />
-  <input type="text" name="category" placeholder="Category" required />
-  <input type="text" name="tags" placeholder="Tags (comma separated)" />
-  <textarea name="description" placeholder="Description"></textarea>
-  <input type="file" name="audio" accept="audio/*" required />
-  <input type="file" name="image" accept="image/*" required />
-  <button type="submit">Add Post</button>
-</form>
-
-<div id="status"></div>
-
-<!-- Totals -->
-<div id="totals" style="display:none;">
-  <h3>Totals</h3>
-  <p>Total Audios: <span id="totalAudios">0</span></p>
-  <p>Total Images: <span id="totalImages">0</span></p>
-  <p>Total Posts: <span id="totalPosts">0</span></p>
-  <p>Total Downloads: <span id="totalDownloads">0</span></p>
+<!-- LOGIN FORM -->
+<div id="loginDiv">
+  <h2>Admin Login</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="loginError" style="color:red"></p>
 </div>
 
-<!-- Top Downloads -->
-<div id="topDownloads" style="display:none;">
-  <h3>Top Downloads</h3>
-  <ul id="topDownloadsList"></ul>
+<!-- DASHBOARD -->
+<div id="dashboardDiv" class="hidden">
+
+  <h2>Totals</h2>
+  <div class="totals" id="totals"></div>
+
+  <h2>Create New Post</h2>
+  <form id="postForm">
+    <input type="text" name="title" placeholder="Title" required>
+    <input type="text" name="artist" placeholder="Artist" required>
+    <input type="text" name="slug" placeholder="Slug (unique)" required>
+    <input type="text" name="category" placeholder="Category">
+    <input type="text" name="tags" placeholder="Tags (comma separated)">
+    <textarea name="description" placeholder="Description"></textarea>
+    <input type="file" name="audio" accept="audio/*" required>
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">Upload Post</button>
+  </form>
+  <p id="uploadMessage" style="color:green;"></p>
+
+  <h2>Posts</h2>
+  <div id="postsList"></div>
+
+  <button onclick="logout()">Logout</button>
 </div>
 
 <script>
-let token = "";
+const API_URL = "https://cms.zedtopvibes.workers.dev";
 
-// ===== Fetch totals =====
-async function fetchTotals() {
+// ===== LOGIN =====
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const errorEl = document.getElementById("loginError");
+  errorEl.textContent = "";
+
   try {
-    const res = await fetch("https://cms.zedtopvibes.workers.dev/totals");
+    const res = await fetch(API_URL + "/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
     const data = await res.json();
     if (data.success) {
-      document.getElementById("totalAudios").innerText = data.totalAudios;
-      document.getElementById("totalImages").innerText = data.totalImages;
-      document.getElementById("totalPosts").innerText = data.totalPosts;
-      document.getElementById("totalDownloads").innerText = data.totalDownloads;
-      document.getElementById("totals").style.display = "block";
+      localStorage.setItem("zed_cms_token", data.token);
+      showDashboard();
+    } else {
+      errorEl.textContent = data.message || "Login failed";
     }
-  } catch (err) {
-    console.error("Error fetching totals:", err);
-    document.getElementById("status").innerText = "Error fetching totals";
+  } catch(err) {
+    errorEl.textContent = err.message;
   }
 }
 
-// ===== Fetch top downloads =====
-async function fetchTopDownloads(limit = 10) {
+// ===== LOGOUT =====
+function logout() {
+  localStorage.removeItem("zed_cms_token");
+  document.getElementById("dashboardDiv").classList.add("hidden");
+  document.getElementById("loginDiv").classList.remove("hidden");
+}
+
+// ===== SHOW DASHBOARD =====
+async function showDashboard() {
+  document.getElementById("loginDiv").classList.add("hidden");
+  document.getElementById("dashboardDiv").classList.remove("hidden");
+
+  await loadTotals();
+  await loadPosts();
+}
+
+// ===== LOAD TOTALS =====
+async function loadTotals() {
   try {
-    const res = await fetch(`https://cms.zedtopvibes.workers.dev/top-downloads?limit=${limit}`);
+    const res = await fetch(API_URL + "/totals");
     const data = await res.json();
     if (data.success) {
-      const ul = document.getElementById("topDownloadsList");
-      ul.innerHTML = "";
-      data.topSongs.forEach(song => {
-        const li = document.createElement("li");
-        li.textContent = `${song.title} by ${song.artist} - Downloads: ${song.downloads}`;
-        ul.appendChild(li);
-      });
-      document.getElementById("topDownloads").style.display = "block";
+      document.getElementById("totals").textContent =
+        `Posts: ${data.totalPosts}, Images: ${data.totalImages}, Audios: ${data.totalAudios}, Downloads: ${data.totalDownloads}`;
     }
-  } catch (err) {
-    console.error("Error fetching top downloads:", err);
+  } catch(e) {
+    document.getElementById("totals").textContent = "Failed to load totals";
   }
 }
 
-// ===== Login Form =====
-document.getElementById("loginForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const form = e.target;
-  const data = { username: form.username.value, password: form.password.value };
+// ===== LOAD POSTS =====
+async function loadPosts() {
+  try {
+    const list = await fetch(API_URL + "/posts").then(r => r.json()).catch(() => []);
+    const postsDiv = document.getElementById("postsList");
+    postsDiv.innerHTML = "";
 
-  const res = await fetch("https://cms.zedtopvibes.workers.dev/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+    if (!Array.isArray(list) || list.length === 0) {
+      postsDiv.textContent = "No posts yet.";
+      return;
+    }
 
-  const result = await res.json();
-  if (result.success) {
-    token = result.token;
-    document.getElementById("status").innerText = "Login successful!";
-    form.style.display = "none";
-    document.getElementById("postForm").style.display = "block";
+    list.forEach(post => {
+      const div = document.createElement("div");
+      div.className = "card";
 
-    // Fetch totals & top downloads after login
-    fetchTotals();
-    fetchTopDownloads();
-  } else {
-    document.getElementById("status").innerText = "Login failed: " + result.message;
+      div.innerHTML = `
+        <strong>${post.title || "Untitled"}</strong><br>
+        ${post.artist ? "Artist: " + post.artist + "<br>" : ""}
+        ${post.category ? "Category: " + post.category + "<br>" : ""}
+        ${post.tags?.length ? "Tags: " + post.tags.join(", ") + "<br>" : ""}
+        ${post.description || ""}<br>
+        ${post.image ? `<img src="${post.image}" alt="${post.title}">` : ""}
+        ${post.audio ? `<audio controls src="${post.audio}"></audio>` : ""}
+      `;
+      postsDiv.appendChild(div);
+    });
+  } catch(e) {
+    console.error(e);
   }
-});
+}
 
-// ===== Add Post Form =====
-document.getElementById("postForm").addEventListener("submit", async e => {
+// ===== HANDLE NEW POST =====
+document.getElementById("postForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
+  const token = localStorage.getItem("zed_cms_token");
+  const msgEl = document.getElementById("uploadMessage");
+  msgEl.textContent = "";
+
   const formData = new FormData(form);
 
-  const res = await fetch("https://cms.zedtopvibes.workers.dev/posts", {
-    method: "POST",
-    headers: { "Authorization": token },
-    body: formData
-  });
-
-  const result = await res.json();
-  if (result.success) {
-    document.getElementById("status").innerText = "Post added successfully!";
-    form.reset();
-    // Update totals & top downloads
-    fetchTotals();
-    fetchTopDownloads();
-  } else {
-    document.getElementById("status").innerText = "Error: " + result.message;
+  try {
+    const res = await fetch(API_URL + "/posts", {
+      method: "POST",
+      headers: { "Authorization": token },
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success) {
+      msgEl.style.color = "green";
+      msgEl.textContent = "Post uploaded successfully!";
+      form.reset();
+      loadPosts();
+      loadTotals();
+    } else {
+      msgEl.style.color = "red";
+      msgEl.textContent = data.message || "Upload failed";
+    }
+  } catch(err) {
+    msgEl.style.color = "red";
+    msgEl.textContent = err.message;
   }
 });
-</script>
 
+// ===== AUTO LOAD DASHBOARD IF LOGGED IN =====
+if (localStorage.getItem("zed_cms_token")) {
+  showDashboard();
+}
+</script>
 </body>
 </html>
