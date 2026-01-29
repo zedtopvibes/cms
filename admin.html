@@ -5,15 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMS Admin Dashboard</title>
 <style>
-body { font-family: Arial; margin: 20px; }
-form { margin-bottom: 30px; }
-input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
-button { padding: 5px 10px; margin-top: 10px; }
-#status { margin-top: 10px; color: green; }
-hr { margin: 30px 0; }
-table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-th { background-color: #f4f4f4; }
+  body { font-family: Arial; margin: 20px; }
+  form { margin-bottom: 30px; }
+  input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
+  button { padding: 5px 10px; }
+  #status { margin-top: 10px; color: green; }
+  #totals, #topDownloads { margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -38,39 +35,63 @@ th { background-color: #f4f4f4; }
   <button type="submit">Add Post</button>
 </form>
 
-<hr>
+<div id="status"></div>
 
-<h2>Site Totals</h2>
+<!-- Totals -->
 <div id="totals" style="display:none;">
+  <h3>Totals</h3>
   <p>Total Audios: <span id="totalAudios">0</span></p>
   <p>Total Images: <span id="totalImages">0</span></p>
   <p>Total Posts: <span id="totalPosts">0</span></p>
   <p>Total Downloads: <span id="totalDownloads">0</span></p>
 </div>
 
-<hr>
-
-<h2>Top Downloads</h2>
+<!-- Top Downloads -->
 <div id="topDownloads" style="display:none;">
-  <table>
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Artist</th>
-        <th>Slug</th>
-        <th>Downloads</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="topDownloadsBody">
-    </tbody>
-  </table>
+  <h3>Top Downloads</h3>
+  <ul id="topDownloadsList"></ul>
 </div>
-
-<div id="status"></div>
 
 <script>
 let token = "";
+
+// ===== Fetch totals =====
+async function fetchTotals() {
+  try {
+    const res = await fetch("https://cms.zedtopvibes.workers.dev/totals");
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById("totalAudios").innerText = data.totalAudios;
+      document.getElementById("totalImages").innerText = data.totalImages;
+      document.getElementById("totalPosts").innerText = data.totalPosts;
+      document.getElementById("totalDownloads").innerText = data.totalDownloads;
+      document.getElementById("totals").style.display = "block";
+    }
+  } catch (err) {
+    console.error("Error fetching totals:", err);
+    document.getElementById("status").innerText = "Error fetching totals";
+  }
+}
+
+// ===== Fetch top downloads =====
+async function fetchTopDownloads(limit = 10) {
+  try {
+    const res = await fetch(`https://cms.zedtopvibes.workers.dev/top-downloads?limit=${limit}`);
+    const data = await res.json();
+    if (data.success) {
+      const ul = document.getElementById("topDownloadsList");
+      ul.innerHTML = "";
+      data.topSongs.forEach(song => {
+        const li = document.createElement("li");
+        li.textContent = `${song.title} by ${song.artist} - Downloads: ${song.downloads}`;
+        ul.appendChild(li);
+      });
+      document.getElementById("topDownloads").style.display = "block";
+    }
+  } catch (err) {
+    console.error("Error fetching top downloads:", err);
+  }
+}
 
 // ===== Login Form =====
 document.getElementById("loginForm").addEventListener("submit", async e => {
@@ -90,6 +111,8 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
     document.getElementById("status").innerText = "Login successful!";
     form.style.display = "none";
     document.getElementById("postForm").style.display = "block";
+
+    // Fetch totals & top downloads after login
     fetchTotals();
     fetchTopDownloads();
   } else {
@@ -113,47 +136,13 @@ document.getElementById("postForm").addEventListener("submit", async e => {
   if (result.success) {
     document.getElementById("status").innerText = "Post added successfully!";
     form.reset();
+    // Update totals & top downloads
     fetchTotals();
     fetchTopDownloads();
   } else {
     document.getElementById("status").innerText = "Error: " + result.message;
   }
 });
-
-// ===== Fetch Totals =====
-async function fetchTotals() {
-  const res = await fetch("https://cms.zedtopvibes.workers.dev/totals");
-  const data = await res.json();
-  if (data.success) {
-    document.getElementById("totals").style.display = "block";
-    document.getElementById("totalAudios").innerText = data.totalAudios;
-    document.getElementById("totalImages").innerText = data.totalImages;
-    document.getElementById("totalPosts").innerText = data.totalPosts;
-    document.getElementById("totalDownloads").innerText = data.totalDownloads;
-  }
-}
-
-// ===== Fetch Top Downloads =====
-async function fetchTopDownloads() {
-  const res = await fetch("https://cms.zedtopvibes.workers.dev/top-downloads?limit=10");
-  const data = await res.json();
-  if (data.success) {
-    document.getElementById("topDownloads").style.display = "block";
-    const tbody = document.getElementById("topDownloadsBody");
-    tbody.innerHTML = "";
-    data.topSongs.forEach(song => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${song.title}</td>
-        <td>${song.artist}</td>
-        <td>${song.slug}</td>
-        <td>${song.downloads}</td>
-        <td><a href="https://cms.zedtopvibes.workers.dev/download/${song.slug}" target="_blank">Download</a></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-}
 </script>
 
 </body>
