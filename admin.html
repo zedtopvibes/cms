@@ -3,329 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZedTopVibes Admin Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ZED CMS Admin Dashboard</title>
     <style>
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #7209b7;
-            --danger: #f72585;
-            --success: #4cc9f0;
-            --warning: #f8961e;
-            --dark: #1a1a2e;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --gray-light: #e9ecef;
-            --border-radius: 8px;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-dark: #2667cc;
+            --secondary: #8338ec;
+            --success: #38b000;
+            --danger: #ff006e;
+            --warning: #ffbe0b;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
         }
 
         body {
-            background-color: #f5f7fb;
-            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
             line-height: 1.6;
-            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            background: var(--light-gray);
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #cc0058;
+        }
+
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
         }
 
         /* Login Page */
         .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
-        }
-
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            width: 100%;
             max-width: 400px;
+            margin: 5rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .login-box h1 {
+        .login-container h2 {
             text-align: center;
-            color: var(--dark);
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
-        .login-box h1 i {
+            margin-bottom: 1.5rem;
             color: var(--primary);
-            margin-right: 10px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.2rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
         }
 
-        .form-group input {
+        .form-control {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: var(--transition);
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
         }
 
-        .form-group input:focus {
-            border-color: var(--primary);
+        .form-control:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
         }
 
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: var(--primary);
-            color: white;
+            padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: var(--border-radius);
+            border-radius: 4px;
+            font-size: 1rem;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: var(--transition);
-            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
             width: 100%;
         }
 
-        .btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #6a2bc0;
         }
 
         .btn-danger {
-            background-color: var(--danger);
+            background: var(--danger);
+            color: white;
         }
 
         .btn-danger:hover {
-            background-color: #e1156d;
+            background: #cc0058;
         }
 
         .btn-success {
-            background-color: var(--success);
+            background: var(--success);
+            color: white;
         }
 
         .btn-success:hover {
-            background-color: #3bb4d6;
+            background: #2d9500;
         }
 
-        .btn-warning {
-            background-color: var(--warning);
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
         }
 
-        .btn-warning:hover {
-            background-color: #e6891a;
-        }
-
-        .message {
-            padding: 12px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            text-align: center;
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
             display: none;
         }
 
-        .message.success {
-            background-color: rgba(76, 201, 240, 0.2);
-            color: #0d7a96;
-            border: 1px solid var(--success);
-            display: block;
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
-        .message.error {
-            background-color: rgba(247, 37, 133, 0.2);
-            color: #c2185b;
-            border: 1px solid var(--danger);
-            display: block;
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
-        /* Dashboard */
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: var(--dark);
-            color: white;
-            padding: 20px 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            transition: var(--transition);
-            z-index: 100;
-        }
-
-        .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-header h2 {
-            display: flex;
-            align-items: center;
-            font-size: 22px;
-        }
-
-        .sidebar-header h2 i {
-            margin-right: 10px;
-            color: var(--primary);
-        }
-
-        .sidebar-nav ul {
-            list-style: none;
-        }
-
-        .sidebar-nav li {
-            margin-bottom: 5px;
-        }
-
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .sidebar-nav a:hover,
-        .sidebar-nav a.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .sidebar-nav i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 250px;
-            padding: 20px;
-            transition: var(--transition);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .header h1 {
-            color: var(--dark);
-            font-size: 28px;
-        }
-
-        .logout-btn {
-            background-color: var(--danger);
-            color: white;
-            padding: 8px 16px;
-            border-radius: var(--border-radius);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            transition: var(--transition);
-        }
-
-        .logout-btn:hover {
-            background-color: #e1156d;
-        }
-
-        .logout-btn i {
-            margin-right: 5px;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--dark);
-            cursor: pointer;
-        }
-
-        /* Dashboard Cards */
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
+        /* Posts Table */
         .card {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
         }
 
         .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .card-header h3 {
-            font-size: 18px;
-            color: var(--dark);
-        }
-
-        .card-header i {
-            font-size: 24px;
-            color: var(--primary);
         }
 
         .card-body {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--dark);
+            padding: 1.5rem;
         }
 
-        /* Table */
         .table-container {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            margin-bottom: 30px;
             overflow-x: auto;
         }
 
@@ -334,304 +258,303 @@
             border-collapse: collapse;
         }
 
-        th, td {
-            padding: 15px;
+        th {
+            background: var(--light);
+            font-weight: 600;
             text-align: left;
-            border-bottom: 1px solid var(--gray-light);
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
         }
 
-        th {
-            background-color: var(--gray-light);
-            font-weight: 600;
-            color: var(--dark);
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
         }
 
         tr:hover {
-            background-color: rgba(67, 97, 238, 0.05);
+            background: var(--light-gray);
         }
 
-        .status {
-            padding: 5px 10px;
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
 
-        .status.published {
-            background-color: rgba(76, 201, 240, 0.2);
-            color: #0d7a96;
+        .status-published {
+            background: #d4edda;
+            color: #155724;
         }
 
-        .status.draft {
-            background-color: rgba(248, 150, 30, 0.2);
-            color: #b4690e;
+        .status-draft {
+            background: #fff3cd;
+            color: #856404;
         }
 
-        .status.scheduled {
-            background-color: rgba(114, 9, 183, 0.2);
-            color: #7209b7;
+        .status-scheduled {
+            background: #cce5ff;
+            color: #004085;
         }
 
         .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 0.5rem;
         }
 
-        .action-btn {
-            padding: 5px 10px;
-            border-radius: var(--border-radius);
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
             border: none;
             cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
+            font-size: 1rem;
+            color: var(--gray);
+            position: relative;
         }
 
-        .action-btn.edit {
-            background-color: rgba(67, 97, 238, 0.1);
+        .tab:hover {
+            color: var(--dark);
+        }
+
+        .tab.active {
             color: var(--primary);
+            font-weight: 600;
         }
 
-        .action-btn.delete {
-            background-color: rgba(247, 37, 133, 0.1);
-            color: var(--danger);
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
         }
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .action-btn.edit:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .action-btn.delete:hover {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        /* Form */
-        .form-container {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            resize: vertical;
-            min-height: 120px;
-            transition: var(--transition);
-        }
-
-        textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-
-        select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: var(--transition);
-        }
-
-        select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-
-        .file-input {
-            border: 1px dashed #ddd;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .file-input:hover {
-            border-color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .file-input input {
+        .tab-content {
             display: none;
         }
 
-        .file-label {
+        .tab-content.active {
             display: block;
+        }
+
+        /* Forms */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-preview {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .preview-item {
+            width: 150px;
+            height: 150px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item audio {
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .remove-file {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
             cursor: pointer;
             color: var(--gray);
         }
 
-        .file-label i {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: var(--primary);
+        /* Confirmation Dialog */
+        .confirmation-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog-content {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .dialog-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
         }
 
         /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 30px;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
         }
 
-        .pagination button {
-            padding: 8px 16px;
-            background-color: white;
-            border: 1px solid var(--gray-light);
-            border-radius: var(--border-radius);
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 4px;
             cursor: pointer;
-            transition: var(--transition);
         }
 
-        .pagination button.active {
-            background-color: var(--primary);
+        .page-btn.active {
+            background: var(--primary);
             color: white;
             border-color: var(--primary);
         }
 
-        .pagination button:hover:not(.active) {
-            background-color: var(--gray-light);
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        /* Bulk Actions */
-        .bulk-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--light-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        .bulk-select {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Filter Section */
-        .filter-section {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: flex-end;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Responsive */
-        @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-        }
-
         @media (max-width: 768px) {
-            .dashboard-cards {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
             }
-            
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
+
             .action-buttons {
                 flex-direction: column;
-                gap: 5px;
-            }
-            
-            .login-box {
-                padding: 30px 20px;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .bulk-actions {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .filter-row {
-                flex-direction: column;
-            }
-            
-            .filter-group {
-                width: 100%;
             }
         }
     </style>
@@ -639,486 +562,540 @@
 <body>
     <!-- Login Page -->
     <div id="login-page" class="login-container">
-        <div class="login-box">
-            <h1><i class="fas fa-headphones"></i> ZedTopVibes Admin</h1>
-            <div id="login-message" class="message"></div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
+        <h2>ZED CMS Admin Login</h2>
+        <div id="login-alert" class="alert alert-error" style="display: none;"></div>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="login-btn">Login</button>
+        </form>
+    </div>
+
+    <!-- Dashboard (Hidden by default) -->
+    <div id="dashboard" style="display: none;">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">ZED CMS Admin</div>
+                    <nav>
+                        <ul>
+                            <li><a href="#" class="nav-link active" data-page="posts">Posts</a></li>
+                            <li><a href="#" class="nav-link" data-page="create">Create Post</a></li>
+                            <li><a href="#" class="nav-link" data-page="drafts">Drafts & Scheduled</a></li>
+                            <li><a href="#" class="nav-link" data-page="taxonomies">Taxonomies</a></li>
+                        </ul>
+                    </nav>
+                    <div class="user-info">
+                        <span id="username-display"></span>
+                        <button class="logout-btn" id="logout-btn">Logout</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                <!-- Alerts -->
+                <div id="alert-container"></div>
+
+                <!-- Posts Page -->
+                <div id="posts-page" class="page-content active">
+                    <h1 class="page-title">Posts Management</h1>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>All Posts</h2>
+                            <div>
+                                <button class="btn btn-secondary btn-small" id="refresh-posts">Refresh</button>
+                                <button class="btn btn-danger btn-small" id="bulk-delete-btn" style="display: none;">Delete Selected</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table id="posts-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 30px;"><input type="checkbox" id="select-all"></th>
+                                            <th>Title</th>
+                                            <th>Artist</th>
+                                            <th>Category</th>
+                                            <th>Status</th>
+                                            <th>Views</th>
+                                            <th>Created</th>
+                                            <th>Updated</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="posts-table-body">
+                                        <!-- Posts will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination" id="pagination">
+                                <!-- Pagination will be generated here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn">Login</button>
-            </form>
+
+                <!-- Create Post Page -->
+                <div id="create-page" class="page-content">
+                    <h1 class="page-title">Create New Post</h1>
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="create-post-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="title">Title *</label>
+                                        <input type="text" id="title" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="artist">Artist *</label>
+                                        <input type="text" id="artist" class="form-control" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="category">Category</label>
+                                        <input type="text" id="category" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tags">Tags (comma separated)</label>
+                                        <input type="text" id="tags" class="form-control" placeholder="tag1, tag2, tag3">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea id="description" class="form-control" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="status">Status</label>
+                                        <select id="status" class="form-control">
+                                            <option value="draft">Draft</option>
+                                            <option value="published">Published</option>
+                                            <option value="scheduled">Scheduled</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" id="scheduled-field" style="display: none;">
+                                        <label for="scheduled_at">Scheduled Date & Time</label>
+                                        <input type="datetime-local" id="scheduled_at" class="form-control">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Audio File (MP3)</label>
+                                        <div class="file-upload" id="audio-upload">
+                                            <span>Click to upload audio file (.mp3)</span>
+                                            <input type="file" id="audio" accept=".mp3,audio/mpeg">
+                                        </div>
+                                        <div class="file-preview" id="audio-preview"></div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Image File (JPG/PNG)</label>
+                                        <div class="file-upload" id="image-upload">
+                                            <span>Click to upload image file (.jpg, .png)</span>
+                                            <input type="file" id="image" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                                        </div>
+                                        <div class="file-preview" id="image-preview"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary" id="create-post-btn">Create Post</button>
+                                    <button type="reset" class="btn btn-secondary">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drafts & Scheduled Page -->
+                <div id="drafts-page" class="page-content">
+                    <h1 class="page-title">Drafts & Scheduled Posts</h1>
+                    
+                    <div class="tabs">
+                        <button class="tab active" data-tab="drafts-tab">Drafts</button>
+                        <button class="tab" data-tab="scheduled-tab">Scheduled</button>
+                    </div>
+                    
+                    <div id="drafts-tab" class="tab-content active">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="drafts-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Artist</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="drafts-table-body">
+                                        <!-- Drafts will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="scheduled-tab" class="tab-content">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="scheduled-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Artist</th>
+                                            <th>Scheduled For</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scheduled-table-body">
+                                        <!-- Scheduled posts will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Taxonomies Page -->
+                <div id="taxonomies-page" class="page-content">
+                    <h1 class="page-title">Taxonomies</h1>
+                    
+                    <div class="tabs">
+                        <button class="tab active" data-tab="artists-tab">Artists</button>
+                        <button class="tab" data-tab="tags-tab">Tags</button>
+                        <button class="tab" data-tab="categories-tab">Categories</button>
+                    </div>
+                    
+                    <div id="artists-tab" class="tab-content active">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="artists-list">
+                                    <!-- Artists will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="tags-tab" class="tab-content">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="tags-list">
+                                    <!-- Tags will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="categories-tab" class="tab-content">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="categories-list">
+                                    <!-- Categories will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Post Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Post</h3>
+                <button class="close-modal" id="close-edit-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-post-form">
+                    <input type="hidden" id="edit-post-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-title">Title *</label>
+                            <input type="text" id="edit-title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-artist">Artist *</label>
+                            <input type="text" id="edit-artist" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-category">Category</label>
+                            <input type="text" id="edit-category" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-tags">Tags (comma separated)</label>
+                            <input type="text" id="edit-tags" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-description">Description</label>
+                        <textarea id="edit-description" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-status">Status</label>
+                            <select id="edit-status" class="form-control">
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                                <option value="scheduled">Scheduled</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="edit-scheduled-field" style="display: none;">
+                            <label for="edit-scheduled_at">Scheduled Date & Time</label>
+                            <input type="datetime-local" id="edit-scheduled_at" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Replace Audio File (MP3)</label>
+                            <div class="file-upload" id="edit-audio-upload">
+                                <span>Click to upload new audio file</span>
+                                <input type="file" id="edit-audio" accept=".mp3,audio/mpeg">
+                            </div>
+                            <div class="file-preview" id="edit-audio-preview"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Replace Image File (JPG/PNG)</label>
+                            <div class="file-upload" id="edit-image-upload">
+                                <span>Click to upload new image file</span>
+                                <input type="file" id="edit-image" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                            </div>
+                            <div class="file-preview" id="edit-image-preview"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="save-edit-btn">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard" class="dashboard-container" style="display: none;">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2><i class="fas fa-headphones"></i> ZedTopVibes</h2>
-                <p>Admin Dashboard</p>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="#" id="nav-dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="#" id="nav-posts"><i class="fas fa-music"></i> Posts</a></li>
-                    <li><a href="#" id="nav-create"><i class="fas fa-plus-circle"></i> Create Post</a></li>
-                    <li><a href="#" id="nav-drafts"><i class="fas fa-file-alt"></i> Drafts</a></li>
-                    <li><a href="#" id="nav-logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
-            </nav>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content" id="main-content">
-            <!-- Header -->
-            <div class="header">
-                <button class="mobile-menu-btn" id="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 id="page-title">Dashboard</h1>
-                <a href="#" class="logout-btn" id="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </div>
-
-            <!-- Dashboard Content -->
-            <div id="dashboard-content">
-                <!-- Dashboard Overview -->
-                <div id="dashboard-overview">
-                    <div class="dashboard-cards">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>Total Posts</h3>
-                                <i class="fas fa-music"></i>
-                            </div>
-                            <div class="card-body" id="total-posts">0</div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>Published</h3>
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="card-body" id="published-posts">0</div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>Drafts</h3>
-                                <i class="fas fa-file-alt"></i>
-                            </div>
-                            <div class="card-body" id="draft-posts">0</div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>Scheduled</h3>
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="card-body" id="scheduled-posts">0</div>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <h2 style="padding: 20px 20px 0;">Recent Posts</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Artist</th>
-                                    <th>Category</th>
-                                    <th>Status</th>
-                                    <th>Views</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-posts">
-                                <!-- Recent posts will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Posts Management -->
-                <div id="posts-management" style="display: none;">
-                    <div class="filter-section">
-                        <div class="filter-row">
-                            <div class="filter-group">
-                                <label for="filter-artist">Artist</label>
-                                <select id="filter-artist">
-                                    <option value="">All Artists</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="filter-category">Category</label>
-                                <select id="filter-category">
-                                    <option value="">All Categories</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="filter-status">Status</label>
-                                <select id="filter-status">
-                                    <option value="">All Statuses</option>
-                                    <option value="published">Published</option>
-                                    <option value="draft">Draft</option>
-                                    <option value="scheduled">Scheduled</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <button class="btn" id="apply-filters">Apply Filters</button>
-                                <button class="btn btn-warning" id="reset-filters" style="margin-top: 5px;">Reset</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bulk-actions">
-                        <div class="bulk-select">
-                            <input type="checkbox" id="select-all">
-                            <label for="select-all">Select All</label>
-                            <button class="btn btn-danger" id="bulk-delete-btn" style="margin-left: 15px;">
-                                <i class="fas fa-trash"></i> Delete Selected
-                            </button>
-                        </div>
-                        <div>
-                            <span id="selected-count">0 posts selected</span>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th width="50">
-                                        <input type="checkbox" id="table-select-all">
-                                    </th>
-                                    <th>Title</th>
-                                    <th>Artist</th>
-                                    <th>Category</th>
-                                    <th>Tags</th>
-                                    <th>Status</th>
-                                    <th>Views</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="posts-table">
-                                <!-- Posts will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="pagination" id="pagination">
-                        <!-- Pagination will be generated here -->
-                    </div>
-                </div>
-
-                <!-- Create Post Form -->
-                <div id="create-post" style="display: none;">
-                    <div class="form-container">
-                        <h2 style="margin-bottom: 20px;">Create New Post</h2>
-                        <div id="create-message" class="message"></div>
-                        <form id="create-post-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="post-title">Title *</label>
-                                    <input type="text" id="post-title" name="title" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="post-artist">Artist *</label>
-                                    <input type="text" id="post-artist" name="artist" required>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="post-slug">Slug *</label>
-                                    <input type="text" id="post-slug" name="slug" required>
-                                    <small style="color: var(--gray); margin-top: 5px; display: block;">URL-friendly version of the title</small>
-                                </div>
-                                <div class="form-group">
-                                    <label for="post-category">Category</label>
-                                    <input type="text" id="post-category" name="category">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="post-tags">Tags (comma separated)</label>
-                                    <input type="text" id="post-tags" name="tags">
-                                </div>
-                                <div class="form-group">
-                                    <label for="post-status">Status *</label>
-                                    <select id="post-status" name="status" required>
-                                        <option value="draft">Draft</option>
-                                        <option value="published">Published</option>
-                                        <option value="scheduled">Scheduled</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-row" id="scheduled-date-row" style="display: none;">
-                                <div class="form-group">
-                                    <label for="post-scheduled">Scheduled Date & Time</label>
-                                    <input type="datetime-local" id="post-scheduled" name="scheduled_at">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group full-width">
-                                    <label for="post-description">Description</label>
-                                    <textarea id="post-description" name="description" rows="4"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <div class="file-input">
-                                        <label class="file-label" for="post-audio">
-                                            <i class="fas fa-file-audio"></i>
-                                            <div>Upload Audio File</div>
-                                            <div id="audio-file-name" style="font-size: 14px; margin-top: 5px;">No file selected</div>
-                                            <small style="color: var(--gray);">MP3 format recommended</small>
-                                        </label>
-                                        <input type="file" id="post-audio" name="audio" accept="audio/*">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="file-input">
-                                        <label class="file-label" for="post-image">
-                                            <i class="fas fa-file-image"></i>
-                                            <div>Upload Image File</div>
-                                            <div id="image-file-name" style="font-size: 14px; margin-top: 5px;">No file selected</div>
-                                            <small style="color: var(--gray);">JPG/PNG format recommended</small>
-                                        </label>
-                                        <input type="file" id="post-image" name="image" accept="image/*">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group full-width">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-plus-circle"></i> Create Post
-                                    </button>
-                                    <button type="button" class="btn btn-warning" id="reset-form" style="margin-top: 10px;">
-                                        <i class="fas fa-redo"></i> Reset Form
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Drafts Management -->
-                <div id="drafts-management" style="display: none;">
-                    <div class="table-container">
-                        <h2 style="padding: 20px 20px 0;">Drafts & Scheduled Posts</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Artist</th>
-                                    <th>Category</th>
-                                    <th>Status</th>
-                                    <th>Scheduled Date</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="drafts-table">
-                                <!-- Drafts will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <!-- Confirmation Dialog -->
+    <div id="confirmation-dialog" class="confirmation-dialog">
+        <div class="dialog-content">
+            <h3 id="confirmation-title">Confirm Action</h3>
+            <p id="confirmation-message">Are you sure you want to perform this action?</p>
+            <div class="dialog-actions">
+                <button class="btn btn-danger" id="confirm-btn">Confirm</button>
+                <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
-        // API Configuration
-        const API_BASE_URL = 'https://cms.zedtopvibes.workers.dev';
-        let currentPage = 1;
-        let totalPosts = 0;
-        const limit = 10;
-        let allPosts = [];
-        let selectedPosts = new Set();
+        // Configuration
+        const API_BASE_URL = ''; // Set your Worker URL here, e.g., 'https://your-worker.workers.dev'
+        const TOKEN_KEY = 'zed_cms_token';
+        const USERNAME_KEY = 'zed_cms_username';
+
+        // State management
+        let state = {
+            token: localStorage.getItem(TOKEN_KEY) || null,
+            username: localStorage.getItem(USERNAME_KEY) || null,
+            currentPage: 'posts',
+            posts: [],
+            currentPosts: [],
+            pagination: {
+                currentPage: 1,
+                totalPages: 1,
+                pageSize: 10
+            },
+            selectedPosts: new Set(),
+            drafts: [],
+            scheduled: [],
+            artists: [],
+            tags: [],
+            categories: [],
+            editPostId: null,
+            confirmationCallback: null
+        };
 
         // DOM Elements
-        const loginPage = document.getElementById('login-page');
-        const dashboard = document.getElementById('dashboard');
-        const loginForm = document.getElementById('login-form');
-        const loginMessage = document.getElementById('login-message');
-        const logoutBtn = document.getElementById('logout-btn');
-        const navLogout = document.getElementById('nav-logout');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.getElementById('sidebar');
-        const pageTitle = document.getElementById('page-title');
+        const elements = {
+            // Pages
+            loginPage: document.getElementById('login-page'),
+            dashboard: document.getElementById('dashboard'),
+            
+            // Login
+            loginForm: document.getElementById('login-form'),
+            loginAlert: document.getElementById('login-alert'),
+            loginBtn: document.getElementById('login-btn'),
+            
+            // Dashboard
+            logoutBtn: document.getElementById('logout-btn'),
+            usernameDisplay: document.getElementById('username-display'),
+            navLinks: document.querySelectorAll('.nav-link'),
+            pageContents: document.querySelectorAll('.page-content'),
+            
+            // Posts
+            postsTableBody: document.getElementById('posts-table-body'),
+            pagination: document.getElementById('pagination'),
+            selectAll: document.getElementById('select-all'),
+            bulkDeleteBtn: document.getElementById('bulk-delete-btn'),
+            refreshPosts: document.getElementById('refresh-posts'),
+            
+            // Create Post
+            createPostForm: document.getElementById('create-post-form'),
+            createPostBtn: document.getElementById('create-post-btn'),
+            statusSelect: document.getElementById('status'),
+            scheduledField: document.getElementById('scheduled-field'),
+            scheduledAt: document.getElementById('scheduled_at'),
+            audioUpload: document.getElementById('audio-upload'),
+            audioInput: document.getElementById('audio'),
+            audioPreview: document.getElementById('audio-preview'),
+            imageUpload: document.getElementById('image-upload'),
+            imageInput: document.getElementById('image'),
+            imagePreview: document.getElementById('image-preview'),
+            
+            // Drafts & Scheduled
+            tabs: document.querySelectorAll('.tab'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            draftsTableBody: document.getElementById('drafts-table-body'),
+            scheduledTableBody: document.getElementById('scheduled-table-body'),
+            
+            // Taxonomies
+            artistsList: document.getElementById('artists-list'),
+            tagsList: document.getElementById('tags-list'),
+            categoriesList: document.getElementById('categories-list'),
+            
+            // Edit Modal
+            editModal: document.getElementById('edit-modal'),
+            editPostForm: document.getElementById('edit-post-form'),
+            editPostId: document.getElementById('edit-post-id'),
+            editTitle: document.getElementById('edit-title'),
+            editArtist: document.getElementById('edit-artist'),
+            editCategory: document.getElementById('edit-category'),
+            editTags: document.getElementById('edit-tags'),
+            editDescription: document.getElementById('edit-description'),
+            editStatus: document.getElementById('edit-status'),
+            editScheduledField: document.getElementById('edit-scheduled-field'),
+            editScheduledAt: document.getElementById('edit-scheduled_at'),
+            editAudioUpload: document.getElementById('edit-audio-upload'),
+            editAudioInput: document.getElementById('edit-audio'),
+            editAudioPreview: document.getElementById('edit-audio-preview'),
+            editImageUpload: document.getElementById('edit-image-upload'),
+            editImageInput: document.getElementById('edit-image'),
+            editImagePreview: document.getElementById('edit-image-preview'),
+            closeEditModal: document.getElementById('close-edit-modal'),
+            cancelEditBtn: document.getElementById('cancel-edit-btn'),
+            saveEditBtn: document.getElementById('save-edit-btn'),
+            
+            // Confirmation Dialog
+            confirmationDialog: document.getElementById('confirmation-dialog'),
+            confirmationTitle: document.getElementById('confirmation-title'),
+            confirmationMessage: document.getElementById('confirmation-message'),
+            confirmBtn: document.getElementById('confirm-btn'),
+            cancelBtn: document.getElementById('cancel-btn'),
+            
+            // Alerts
+            alertContainer: document.getElementById('alert-container')
+        };
 
-        // Dashboard Sections
-        const dashboardOverview = document.getElementById('dashboard-overview');
-        const postsManagement = document.getElementById('posts-management');
-        const createPost = document.getElementById('create-post');
-        const draftsManagement = document.getElementById('drafts-management');
-
-        // Navigation
-        const navDashboard = document.getElementById('nav-dashboard');
-        const navPosts = document.getElementById('nav-posts');
-        const navCreate = document.getElementById('nav-create');
-        const navDrafts = document.getElementById('nav-drafts');
-
-        // Check if user is already logged in
-        document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('auth_token');
-            if (token) {
+        // Initialize the application
+        function init() {
+            // Check if user is already logged in
+            if (state.token && state.username) {
                 showDashboard();
-                loadDashboardData();
             } else {
                 showLogin();
             }
-
-            // Set up event listeners
+            
+            // Setup event listeners
             setupEventListeners();
-        });
+        }
 
-        // Event Listeners Setup
+        // Setup all event listeners
         function setupEventListeners() {
-            // Login form
-            loginForm.addEventListener('submit', handleLogin);
-
-            // Logout buttons
-            logoutBtn.addEventListener('click', handleLogout);
-            navLogout.addEventListener('click', handleLogout);
-
-            // Mobile menu toggle
-            mobileMenuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
-
+            // Login
+            elements.loginForm.addEventListener('submit', handleLogin);
+            
+            // Logout
+            elements.logoutBtn.addEventListener('click', handleLogout);
+            
             // Navigation
-            navDashboard.addEventListener('click', (e) => {
-                e.preventDefault();
-                showSection('dashboard');
-                updateActiveNav(navDashboard);
+            elements.navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navigateTo(link.dataset.page);
+                });
             });
-
-            navPosts.addEventListener('click', (e) => {
-                e.preventDefault();
-                showSection('posts');
-                updateActiveNav(navPosts);
-                loadPosts();
+            
+            // Posts
+            elements.selectAll.addEventListener('change', toggleSelectAll);
+            elements.bulkDeleteBtn.addEventListener('click', confirmBulkDelete);
+            elements.refreshPosts.addEventListener('click', loadPosts);
+            
+            // Create Post
+            elements.createPostForm.addEventListener('submit', handleCreatePost);
+            elements.statusSelect.addEventListener('change', toggleScheduledField);
+            
+            // File Uploads
+            elements.audioUpload.addEventListener('click', () => elements.audioInput.click());
+            elements.audioInput.addEventListener('change', handleAudioUpload);
+            elements.imageUpload.addEventListener('click', () => elements.imageInput.click());
+            elements.imageInput.addEventListener('change', handleImageUpload);
+            
+            // Edit Post
+            elements.editAudioUpload.addEventListener('click', () => elements.editAudioInput.click());
+            elements.editAudioInput.addEventListener('change', handleEditAudioUpload);
+            elements.editImageUpload.addEventListener('click', () => elements.editImageInput.click());
+            elements.editImageInput.addEventListener('change', handleEditImageUpload);
+            elements.editStatus.addEventListener('change', toggleEditScheduledField);
+            elements.closeEditModal.addEventListener('click', closeEditModal);
+            elements.cancelEditBtn.addEventListener('click', closeEditModal);
+            elements.editPostForm.addEventListener('submit', handleEditPost);
+            
+            // Tabs
+            elements.tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    switchTab(tabId);
+                });
             });
-
-            navCreate.addEventListener('click', (e) => {
-                e.preventDefault();
-                showSection('create');
-                updateActiveNav(navCreate);
-            });
-
-            navDrafts.addEventListener('click', (e) => {
-                e.preventDefault();
-                showSection('drafts');
-                updateActiveNav(navDrafts);
-                loadDrafts();
-            });
-
-            // Post status change
-            document.getElementById('post-status').addEventListener('change', (e) => {
-                const scheduledRow = document.getElementById('scheduled-date-row');
-                scheduledRow.style.display = e.target.value === 'scheduled' ? 'block' : 'none';
-            });
-
-            // File input labels
-            document.getElementById('post-audio').addEventListener('change', (e) => {
-                const fileName = e.target.files.length > 0 ? e.target.files[0].name : 'No file selected';
-                document.getElementById('audio-file-name').textContent = fileName;
-            });
-
-            document.getElementById('post-image').addEventListener('change', (e) => {
-                const fileName = e.target.files.length > 0 ? e.target.files[0].name : 'No file selected';
-                document.getElementById('image-file-name').textContent = fileName;
-            });
-
-            // Create post form
-            document.getElementById('create-post-form').addEventListener('submit', handleCreatePost);
-            document.getElementById('reset-form').addEventListener('click', resetCreateForm);
-
-            // Filter events
-            document.getElementById('apply-filters').addEventListener('click', applyFilters);
-            document.getElementById('reset-filters').addEventListener('click', resetFilters);
-
-            // Bulk actions
-            document.getElementById('select-all').addEventListener('change', handleSelectAll);
-            document.getElementById('table-select-all').addEventListener('change', handleTableSelectAll);
-            document.getElementById('bulk-delete-btn').addEventListener('click', handleBulkDelete);
+            
+            // Confirmation Dialog
+            elements.confirmBtn.addEventListener('click', executeConfirmation);
+            elements.cancelBtn.addEventListener('click', closeConfirmationDialog);
         }
 
-        // Show/Hide Functions
-        function showLogin() {
-            loginPage.style.display = 'flex';
-            dashboard.style.display = 'none';
-        }
-
-        function showDashboard() {
-            loginPage.style.display = 'none';
-            dashboard.style.display = 'flex';
-            showSection('dashboard');
-            updateActiveNav(navDashboard);
-        }
-
-        function showSection(section) {
-            // Hide all sections
-            dashboardOverview.style.display = 'none';
-            postsManagement.style.display = 'none';
-            createPost.style.display = 'none';
-            draftsManagement.style.display = 'none';
-
-            // Show the selected section
-            switch(section) {
-                case 'dashboard':
-                    dashboardOverview.style.display = 'block';
-                    pageTitle.textContent = 'Dashboard';
-                    break;
-                case 'posts':
-                    postsManagement.style.display = 'block';
-                    pageTitle.textContent = 'Posts Management';
-                    break;
-                case 'create':
-                    createPost.style.display = 'block';
-                    pageTitle.textContent = 'Create New Post';
-                    break;
-                case 'drafts':
-                    draftsManagement.style.display = 'block';
-                    pageTitle.textContent = 'Drafts & Scheduled Posts';
-                    break;
-            }
-
-            // Close sidebar on mobile
-            if (window.innerWidth < 992) {
-                sidebar.classList.remove('active');
-            }
-        }
-
-        function updateActiveNav(activeNav) {
-            // Remove active class from all nav items
-            document.querySelectorAll('.sidebar-nav a').forEach(nav => {
-                nav.classList.remove('active');
-            });
-
-            // Add active class to clicked nav
-            activeNav.classList.add('active');
-        }
-
-        // Login Handler
+        // Authentication functions
         async function handleLogin(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-
+            
+            // Show loading state
+            elements.loginBtn.innerHTML = '<span class="loading"></span> Logging in...';
+            elements.loginBtn.disabled = true;
+            
             try {
                 const response = await fetch(`${API_BASE_URL}/login`, {
                     method: 'POST',
@@ -1127,712 +1104,825 @@
                     },
                     body: JSON.stringify({ username, password })
                 });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    localStorage.setItem('auth_token', data.token);
-                    showDashboard();
-                    loadDashboardData();
-                    showMessage(loginMessage, 'Login successful!', 'success');
-                } else {
-                    showMessage(loginMessage, data.message || 'Invalid credentials', 'error');
+                
+                if (!response.ok) {
+                    throw new Error('Login failed');
                 }
+                
+                const data = await response.json();
+                
+                // Store token and username
+                state.token = data.token;
+                state.username = username;
+                localStorage.setItem(TOKEN_KEY, data.token);
+                localStorage.setItem(USERNAME_KEY, username);
+                
+                // Show dashboard
+                showDashboard();
+                showAlert('Login successful!', 'success');
+                
             } catch (error) {
-                showMessage(loginMessage, 'Connection error. Please try again.', 'error');
+                showLoginAlert('Invalid username or password');
+            } finally {
+                // Reset login button
+                elements.loginBtn.innerHTML = 'Login';
+                elements.loginBtn.disabled = false;
             }
         }
 
-        // Logout Handler
-        function handleLogout(e) {
-            e.preventDefault();
-            localStorage.removeItem('auth_token');
+        function handleLogout() {
+            state.token = null;
+            state.username = null;
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(USERNAME_KEY);
             showLogin();
-            resetCreateForm();
         }
 
-        // API Helper Functions
-        async function makeRequest(endpoint, options = {}) {
-            const token = localStorage.getItem('auth_token');
+        // Navigation functions
+        function showLogin() {
+            elements.loginPage.style.display = 'block';
+            elements.dashboard.style.display = 'none';
+            elements.loginForm.reset();
+            elements.loginAlert.style.display = 'none';
+        }
+
+        function showDashboard() {
+            elements.loginPage.style.display = 'none';
+            elements.dashboard.style.display = 'block';
+            elements.usernameDisplay.textContent = state.username;
             
-            const defaultHeaders = {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            };
+            // Load initial data
+            loadPosts();
+            navigateTo('posts');
+        }
 
-            if (options.headers) {
-                Object.assign(defaultHeaders, options.headers);
-            }
-
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-                ...options,
-                headers: defaultHeaders
+        function navigateTo(page) {
+            // Update navigation
+            elements.navLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.page === page);
             });
+            
+            // Show the selected page
+            elements.pageContents.forEach(content => {
+                content.classList.toggle('active', content.id === `${page}-page`);
+            });
+            
+            // Load page-specific data
+            switch(page) {
+                case 'posts':
+                    loadPosts();
+                    break;
+                case 'drafts':
+                    loadDrafts();
+                    break;
+                case 'taxonomies':
+                    loadTaxonomies();
+                    break;
+            }
+            
+            state.currentPage = page;
+        }
 
+        // API functions
+        async function apiRequest(endpoint, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${state.token}`
+                }
+            };
+            
+            const mergedOptions = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            };
+            
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, mergedOptions);
+            
             if (response.status === 401) {
                 // Token expired or invalid
-                localStorage.removeItem('auth_token');
-                showLogin();
-                throw new Error('Unauthorized');
-            }
-
-            return response;
-        }
-
-        // Message Display
-        function showMessage(element, message, type = 'success') {
-            element.textContent = message;
-            element.className = `message ${type}`;
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
-
-        // Dashboard Data Loading
-        async function loadDashboardData() {
-            try {
-                const response = await makeRequest('/posts');
-                const data = await response.json();
-                
-                if (data.posts) {
-                    allPosts = data.posts;
-                    
-                    // Update counts
-                    const total = data.posts.length;
-                    const published = data.posts.filter(p => p.status === 'published').length;
-                    const drafts = data.posts.filter(p => p.status === 'draft').length;
-                    const scheduled = data.posts.filter(p => p.status === 'scheduled').length;
-                    
-                    document.getElementById('total-posts').textContent = total;
-                    document.getElementById('published-posts').textContent = published;
-                    document.getElementById('draft-posts').textContent = drafts;
-                    document.getElementById('scheduled-posts').textContent = scheduled;
-                    
-                    // Show recent posts (most recent 5)
-                    const recentPosts = data.posts
-                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                        .slice(0, 5);
-                    
-                    renderRecentPosts(recentPosts);
-                    
-                    // Load filters
-                    loadFilters(data.posts);
-                }
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-            }
-        }
-
-        // Render Recent Posts
-        function renderRecentPosts(posts) {
-            const container = document.getElementById('recent-posts');
-            container.innerHTML = '';
-            
-            if (posts.length === 0) {
-                container.innerHTML = '<tr><td colspan="6" style="text-align: center;">No posts found</td></tr>';
-                return;
+                handleLogout();
+                throw new Error('Session expired. Please login again.');
             }
             
-            posts.forEach(post => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${post.title}</td>
-                    <td>${post.artist}</td>
-                    <td>${post.category || '-'}</td>
-                    <td><span class="status ${post.status}">${post.status}</span></td>
-                    <td>${post.views || 0}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn edit" onclick="editPost('${post.slug}')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        </div>
-                    </td>
-                `;
-                
-                container.appendChild(row);
-            });
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.message || 'API request failed');
+            }
+            
+            return response.json();
         }
 
-        // Load Posts with Pagination
+        // Posts management
         async function loadPosts(page = 1) {
             try {
-                const filterArtist = document.getElementById('filter-artist').value;
-                const filterCategory = document.getElementById('filter-category').value;
-                const filterStatus = document.getElementById('filter-status').value;
+                const data = await apiRequest(`/posts?page=${page}&limit=${state.pagination.pageSize}`);
+                state.posts = data.posts;
+                state.currentPosts = data.posts;
+                state.pagination.currentPage = data.pagination.page;
+                state.pagination.totalPages = data.pagination.pages;
                 
-                let url = `/posts?page=${page}&limit=${limit}`;
-                if (filterArtist) url += `&artist=${filterArtist}`;
-                if (filterStatus) url += `&status=${filterStatus}`;
-                
-                const response = await makeRequest(url);
-                const data = await response.json();
-                
-                if (data.posts) {
-                    renderPostsTable(data.posts);
-                    renderPagination(data.total, page);
-                    updateSelectedCount();
-                }
+                renderPostsTable();
+                renderPagination();
             } catch (error) {
-                console.error('Error loading posts:', error);
+                showAlert(`Failed to load posts: ${error.message}`, 'error');
             }
         }
 
-        // Render Posts Table
-        function renderPostsTable(posts) {
-            const container = document.getElementById('posts-table');
-            container.innerHTML = '';
+        function renderPostsTable() {
+            elements.postsTableBody.innerHTML = '';
             
-            if (posts.length === 0) {
-                container.innerHTML = '<tr><td colspan="8" style="text-align: center;">No posts found</td></tr>';
+            if (state.currentPosts.length === 0) {
+                elements.postsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 2rem;">
+                            No posts found
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
-            posts.forEach(post => {
+            state.currentPosts.forEach(post => {
                 const row = document.createElement('tr');
-                const isSelected = selectedPosts.has(post.id);
+                row.dataset.id = post.id;
+                
+                // Format dates
+                const createdDate = new Date(post.created_at).toLocaleDateString();
+                const updatedDate = new Date(post.updated_at).toLocaleDateString();
+                
+                // Status badge
+                let statusBadge = '';
+                switch(post.status) {
+                    case 'published':
+                        statusBadge = '<span class="status-badge status-published">Published</span>';
+                        break;
+                    case 'draft':
+                        statusBadge = '<span class="status-badge status-draft">Draft</span>';
+                        break;
+                    case 'scheduled':
+                        statusBadge = '<span class="status-badge status-scheduled">Scheduled</span>';
+                        break;
+                }
                 
                 row.innerHTML = `
-                    <td>
-                        <input type="checkbox" class="post-checkbox" data-id="${post.id}" ${isSelected ? 'checked' : ''}>
-                    </td>
+                    <td><input type="checkbox" class="post-checkbox" value="${post.id}"></td>
                     <td>${post.title}</td>
                     <td>${post.artist}</td>
                     <td>${post.category || '-'}</td>
-                    <td>${post.tags ? post.tags.join(', ') : '-'}</td>
-                    <td><span class="status ${post.status}">${post.status}</span></td>
+                    <td>${statusBadge}</td>
                     <td>${post.views || 0}</td>
+                    <td>${createdDate}</td>
+                    <td>${updatedDate}</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn edit" onclick="editPost('${post.slug}')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="action-btn delete" onclick="deletePost('${post.slug}', '${post.title}')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
+                            <button class="btn btn-secondary btn-small edit-post-btn" data-id="${post.id}">Edit</button>
+                            <button class="btn btn-danger btn-small delete-post-btn" data-slug="${post.slug}">Delete</button>
                         </div>
                     </td>
                 `;
                 
-                container.appendChild(row);
+                elements.postsTableBody.appendChild(row);
             });
             
-            // Add event listeners to checkboxes
-            document.querySelectorAll('.post-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', handleCheckboxChange);
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-post-btn').forEach(btn => {
+                btn.addEventListener('click', () => openEditModal(btn.dataset.id));
             });
+            
+            document.querySelectorAll('.delete-post-btn').forEach(btn => {
+                btn.addEventListener('click', () => confirmDeletePost(btn.dataset.slug));
+            });
+            
+            document.querySelectorAll('.post-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', togglePostSelection);
+            });
+            
+            // Update bulk delete button visibility
+            updateBulkDeleteButton();
         }
 
-        // Render Pagination
-        function renderPagination(total, currentPage) {
-            const totalPages = Math.ceil(total / limit);
-            const container = document.getElementById('pagination');
-            container.innerHTML = '';
+        function renderPagination() {
+            elements.pagination.innerHTML = '';
             
-            if (totalPages <= 1) return;
+            const { currentPage, totalPages } = state.pagination;
             
             // Previous button
-            const prevButton = document.createElement('button');
-            prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            prevButton.disabled = currentPage === 1;
-            prevButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    loadPosts(currentPage - 1);
-                }
-            });
-            container.appendChild(prevButton);
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.textContent = '←';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => loadPosts(currentPage - 1));
+            elements.pagination.appendChild(prevBtn);
             
-            // Page buttons
+            // Page numbers
             for (let i = 1; i <= totalPages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                if (i === currentPage) {
-                    pageButton.classList.add('active');
-                }
-                pageButton.addEventListener('click', () => {
-                    loadPosts(i);
-                });
-                container.appendChild(pageButton);
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => loadPosts(i));
+                elements.pagination.appendChild(pageBtn);
             }
             
             // Next button
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-            nextButton.disabled = currentPage === totalPages;
-            nextButton.addEventListener('click', () => {
-                if (currentPage < totalPages) {
-                    loadPosts(currentPage + 1);
-                }
-            });
-            container.appendChild(nextButton);
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.textContent = '→';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => loadPosts(currentPage + 1));
+            elements.pagination.appendChild(nextBtn);
         }
 
-        // Load Filters
-        function loadFilters(posts) {
-            const artists = [...new Set(posts.map(p => p.artist).filter(Boolean))];
-            const categories = [...new Set(posts.map(p => p.category).filter(Boolean))];
-            
-            const artistSelect = document.getElementById('filter-artist');
-            const categorySelect = document.getElementById('filter-category');
-            
-            // Clear existing options (except first)
-            while (artistSelect.options.length > 1) artistSelect.remove(1);
-            while (categorySelect.options.length > 1) categorySelect.remove(1);
-            
-            // Add artists
-            artists.forEach(artist => {
-                const option = document.createElement('option');
-                option.value = artist;
-                option.textContent = artist;
-                artistSelect.appendChild(option);
-            });
-            
-            // Add categories
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categorySelect.appendChild(option);
-            });
-        }
-
-        // Filter Functions
-        function applyFilters() {
-            loadPosts(1);
-        }
-
-        function resetFilters() {
-            document.getElementById('filter-artist').value = '';
-            document.getElementById('filter-category').value = '';
-            document.getElementById('filter-status').value = '';
-            loadPosts(1);
-        }
-
-        // Checkbox Handlers
-        function handleCheckboxChange(e) {
-            const postId = e.target.getAttribute('data-id');
-            
-            if (e.target.checked) {
-                selectedPosts.add(postId);
-            } else {
-                selectedPosts.delete(postId);
-            }
-            
-            updateSelectedCount();
-            updateSelectAllCheckboxes();
-        }
-
-        function handleSelectAll(e) {
-            const isChecked = e.target.checked;
-            const checkboxes = document.querySelectorAll('.post-checkbox');
-            
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = isChecked;
-                const postId = checkbox.getAttribute('data-id');
-                
-                if (isChecked) {
-                    selectedPosts.add(postId);
-                } else {
-                    selectedPosts.delete(postId);
-                }
-            });
-            
-            updateSelectedCount();
-        }
-
-        function handleTableSelectAll(e) {
-            const isChecked = e.target.checked;
-            const checkboxes = document.querySelectorAll('.post-checkbox');
-            const selectAll = document.getElementById('select-all');
-            
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = isChecked;
-                const postId = checkbox.getAttribute('data-id');
-                
-                if (isChecked) {
-                    selectedPosts.add(postId);
-                } else {
-                    selectedPosts.delete(postId);
-                }
-            });
-            
-            selectAll.checked = isChecked;
-            updateSelectedCount();
-        }
-
-        function updateSelectAllCheckboxes() {
-            const checkboxes = document.querySelectorAll('.post-checkbox');
-            const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
-            
-            document.getElementById('select-all').checked = allChecked;
-            document.getElementById('table-select-all').checked = allChecked;
-        }
-
-        function updateSelectedCount() {
-            const count = selectedPosts.size;
-            document.getElementById('selected-count').textContent = `${count} posts selected`;
-        }
-
-        // Bulk Delete
-        async function handleBulkDelete() {
-            if (selectedPosts.size === 0) {
-                alert('Please select at least one post to delete');
-                return;
-            }
-            
-            if (!confirm(`Are you sure you want to delete ${selectedPosts.size} post(s)?`)) {
-                return;
-            }
-            
-            try {
-                const response = await makeRequest('/posts/bulk-delete', {
-                    method: 'POST',
-                    body: JSON.stringify({ ids: Array.from(selectedPosts) })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Reload posts
-                    selectedPosts.clear();
-                    loadPosts(currentPage);
-                    loadDashboardData();
-                    
-                    // Show success message
-                    alert(`Successfully deleted ${data.deleted.length} post(s)`);
-                } else {
-                    alert('Error deleting posts');
-                }
-            } catch (error) {
-                console.error('Error bulk deleting posts:', error);
-                alert('Error deleting posts');
-            }
-        }
-
-        // Create Post Handler
+        // Create post functions
         async function handleCreatePost(e) {
             e.preventDefault();
             
-            const form = e.target;
-            const formData = new FormData(form);
-            const messageElement = document.getElementById('create-message');
+            const formData = new FormData();
             
-            // Validate required fields
-            const title = formData.get('title');
-            const artist = formData.get('artist');
-            const slug = formData.get('slug');
-            const status = formData.get('status');
+            // Add text fields
+            formData.append('title', document.getElementById('title').value);
+            formData.append('artist', document.getElementById('artist').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('tags', document.getElementById('tags').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('status', document.getElementById('status').value);
             
-            if (!title || !artist || !slug || !status) {
-                showMessage(messageElement, 'Please fill in all required fields', 'error');
-                return;
+            if (document.getElementById('status').value === 'scheduled') {
+                formData.append('scheduled_at', document.getElementById('scheduled_at').value);
             }
             
-            // If not draft, require audio and image
-            if (status !== 'draft') {
-                const audioFile = formData.get('audio');
-                const imageFile = formData.get('image');
-                
-                if (!audioFile || !audioFile.name) {
-                    showMessage(messageElement, 'Audio file is required for published/scheduled posts', 'error');
-                    return;
-                }
-                
-                if (!imageFile || !imageFile.name) {
-                    showMessage(messageElement, 'Image file is required for published/scheduled posts', 'error');
-                    return;
-                }
-            }
+            // Add files
+            const audioFile = elements.audioInput.files[0];
+            const imageFile = elements.imageInput.files[0];
             
-            // If scheduled, require scheduled_at
-            if (status === 'scheduled') {
-                const scheduledAt = formData.get('scheduled_at');
-                if (!scheduledAt) {
-                    showMessage(messageElement, 'Scheduled date is required for scheduled posts', 'error');
-                    return;
-                }
-            }
+            if (audioFile) formData.append('audio', audioFile);
+            if (imageFile) formData.append('image', imageFile);
+            
+            // Show loading state
+            elements.createPostBtn.innerHTML = '<span class="loading"></span> Creating...';
+            elements.createPostBtn.disabled = true;
             
             try {
-                // Prepare form data
-                const token = localStorage.getItem('auth_token');
-                const submitFormData = new FormData();
-                
-                // Add all form fields
-                submitFormData.append('title', title);
-                submitFormData.append('artist', artist);
-                submitFormData.append('slug', slug);
-                submitFormData.append('category', formData.get('category') || '');
-                submitFormData.append('tags', formData.get('tags') || '');
-                submitFormData.append('description', formData.get('description') || '');
-                submitFormData.append('status', status);
-                
-                if (formData.get('scheduled_at')) {
-                    submitFormData.append('scheduled_at', formData.get('scheduled_at'));
-                }
-                
-                // Add files if they exist
-                const audioFile = formData.get('audio');
-                if (audioFile && audioFile.name) {
-                    submitFormData.append('audio', audioFile);
-                }
-                
-                const imageFile = formData.get('image');
-                if (imageFile && imageFile.name) {
-                    submitFormData.append('image', imageFile);
-                }
-                
-                // Make request
-                const response = await fetch(`${API_BASE_URL}/posts`, {
+                await apiRequest('/posts', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': token
-                    },
-                    body: submitFormData
+                    body: formData
                 });
                 
-                const data = await response.json();
+                showAlert('Post created successfully!', 'success');
+                elements.createPostForm.reset();
+                clearFilePreviews();
                 
-                if (data.success) {
-                    showMessage(messageElement, 'Post created successfully!', 'success');
-                    resetCreateForm();
-                    
-                    // Reload dashboard data
-                    loadDashboardData();
-                } else {
-                    showMessage(messageElement, data.message || 'Error creating post', 'error');
-                }
+                // Navigate to posts page
+                navigateTo('posts');
+                
             } catch (error) {
-                console.error('Error creating post:', error);
-                showMessage(messageElement, 'Connection error. Please try again.', 'error');
+                showAlert(`Failed to create post: ${error.message}`, 'error');
+            } finally {
+                elements.createPostBtn.innerHTML = 'Create Post';
+                elements.createPostBtn.disabled = false;
             }
         }
 
-        // Reset Create Form
-        function resetCreateForm() {
-            document.getElementById('create-post-form').reset();
-            document.getElementById('audio-file-name').textContent = 'No file selected';
-            document.getElementById('image-file-name').textContent = 'No file selected';
-            document.getElementById('scheduled-date-row').style.display = 'none';
-        }
-
-        // Load Drafts
+        // Drafts & Scheduled functions
         async function loadDrafts() {
             try {
-                const response = await makeRequest('/drafts');
-                const data = await response.json();
+                const data = await apiRequest('/drafts');
+                state.drafts = data.drafts;
+                state.scheduled = data.scheduled;
                 
-                if (data.drafts) {
-                    renderDraftsTable(data.drafts);
-                }
+                renderDraftsTable();
+                renderScheduledTable();
             } catch (error) {
-                console.error('Error loading drafts:', error);
+                showAlert(`Failed to load drafts: ${error.message}`, 'error');
             }
         }
 
-        // Render Drafts Table
-        function renderDraftsTable(drafts) {
-            const container = document.getElementById('drafts-table');
-            container.innerHTML = '';
+        function renderDraftsTable() {
+            elements.draftsTableBody.innerHTML = '';
             
-            if (drafts.length === 0) {
-                container.innerHTML = '<tr><td colspan="7" style="text-align: center;">No drafts found</td></tr>';
+            if (state.drafts.length === 0) {
+                elements.draftsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 2rem;">
+                            No drafts found
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
-            drafts.forEach(post => {
-                const row = document.createElement('tr');
+            state.drafts.forEach(draft => {
+                const createdDate = new Date(draft.created_at).toLocaleDateString();
                 
+                const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${post.title}</td>
-                    <td>${post.artist}</td>
-                    <td>${post.category || '-'}</td>
-                    <td><span class="status ${post.status}">${post.status}</span></td>
-                    <td>${post.scheduled_at ? new Date(post.scheduled_at).toLocaleString() : '-'}</td>
-                    <td>${new Date(post.created_at).toLocaleDateString()}</td>
+                    <td>${draft.title}</td>
+                    <td>${draft.artist}</td>
+                    <td>${createdDate}</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="action-btn edit" onclick="editPost('${post.slug}')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="action-btn delete" onclick="deletePost('${post.slug}', '${post.title}')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
+                            <button class="btn btn-secondary btn-small edit-post-btn" data-id="${draft.id}">Edit</button>
+                            <button class="btn btn-success btn-small publish-draft-btn" data-id="${draft.id}">Publish</button>
+                            <button class="btn btn-danger btn-small delete-post-btn" data-slug="${draft.slug}">Delete</button>
                         </div>
                     </td>
                 `;
                 
-                container.appendChild(row);
+                elements.draftsTableBody.appendChild(row);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.publish-draft-btn').forEach(btn => {
+                btn.addEventListener('click', () => publishDraft(btn.dataset.id));
             });
         }
 
-        // Edit Post
-        async function editPost(slug) {
-            // For simplicity, we'll redirect to the create form and populate with data
-            // In a real implementation, you'd fetch the post and populate the form
-            showSection('create');
-            updateActiveNav(navCreate);
-            pageTitle.textContent = 'Edit Post';
+        function renderScheduledTable() {
+            elements.scheduledTableBody.innerHTML = '';
             
-            try {
-                const response = await makeRequest(`/posts/${slug}`);
-                const post = await response.json();
-                
-                // Populate form
-                document.getElementById('post-title').value = post.title;
-                document.getElementById('post-artist').value = post.artist;
-                document.getElementById('post-slug').value = post.slug;
-                document.getElementById('post-category').value = post.category || '';
-                document.getElementById('post-tags').value = post.tags ? post.tags.join(', ') : '';
-                document.getElementById('post-description').value = post.description || '';
-                document.getElementById('post-status').value = post.status;
-                
-                if (post.status === 'scheduled') {
-                    document.getElementById('scheduled-date-row').style.display = 'block';
-                    // Format date for datetime-local input
-                    const scheduledDate = new Date(post.scheduled_at);
-                    const formattedDate = scheduledDate.toISOString().slice(0, 16);
-                    document.getElementById('post-scheduled').value = formattedDate;
-                }
-                
-                // Update form button
-                const submitBtn = document.querySelector('#create-post-form button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Post';
-                submitBtn.classList.remove('btn-success');
-                submitBtn.classList.add('btn-warning');
-                
-                // Change form behavior to update instead of create
-                const form = document.getElementById('create-post-form');
-                form.onsubmit = async (e) => {
-                    e.preventDefault();
-                    await updatePost(slug, form);
-                };
-                
-                // Add cancel button
-                let cancelBtn = document.getElementById('cancel-edit');
-                if (!cancelBtn) {
-                    cancelBtn = document.createElement('button');
-                    cancelBtn.type = 'button';
-                    cancelBtn.id = 'cancel-edit';
-                    cancelBtn.className = 'btn';
-                    cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Edit';
-                    cancelBtn.style.marginLeft = '10px';
-                    cancelBtn.onclick = () => {
-                        resetCreateForm();
-                        showSection('posts');
-                        updateActiveNav(navPosts);
-                    };
-                    
-                    const formActions = document.querySelector('.form-group.full-width');
-                    formActions.appendChild(cancelBtn);
-                }
-                
-            } catch (error) {
-                console.error('Error loading post for edit:', error);
-                alert('Error loading post data');
-            }
-        }
-
-        // Update Post
-        async function updatePost(slug, form) {
-            const formData = new FormData(form);
-            const messageElement = document.getElementById('create-message');
-            
-            try {
-                const token = localStorage.getItem('auth_token');
-                const submitFormData = new FormData();
-                
-                // Add updated fields
-                submitFormData.append('title', formData.get('title'));
-                submitFormData.append('artist', formData.get('artist'));
-                submitFormData.append('category', formData.get('category') || '');
-                submitFormData.append('description', formData.get('description') || '');
-                submitFormData.append('status', formData.get('status'));
-                
-                if (formData.get('scheduled_at')) {
-                    submitFormData.append('scheduled_at', formData.get('scheduled_at'));
-                }
-                
-                // Add files if they exist
-                const audioFile = formData.get('audio');
-                if (audioFile && audioFile.name) {
-                    submitFormData.append('audio', audioFile);
-                }
-                
-                const imageFile = formData.get('image');
-                if (imageFile && imageFile.name) {
-                    submitFormData.append('image', imageFile);
-                }
-                
-                const response = await fetch(`${API_BASE_URL}/posts/${slug}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': token
-                    },
-                    body: submitFormData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showMessage(messageElement, 'Post updated successfully!', 'success');
-                    
-                    // Reset form and go back to posts
-                    setTimeout(() => {
-                        resetCreateForm();
-                        showSection('posts');
-                        updateActiveNav(navPosts);
-                        loadPosts();
-                        loadDashboardData();
-                    }, 1500);
-                } else {
-                    showMessage(messageElement, data.message || 'Error updating post', 'error');
-                }
-            } catch (error) {
-                console.error('Error updating post:', error);
-                showMessage(messageElement, 'Connection error. Please try again.', 'error');
-            }
-        }
-
-        // Delete Post
-        async function deletePost(slug, title) {
-            if (!confirm(`Are you sure you want to delete "${title}"?`)) {
+            if (state.scheduled.length === 0) {
+                elements.scheduledTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 2rem;">
+                            No scheduled posts found
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
+            state.scheduled.forEach(post => {
+                const scheduledDate = new Date(post.scheduled_at).toLocaleString();
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${post.title}</td>
+                    <td>${post.artist}</td>
+                    <td>${scheduledDate}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary btn-small edit-post-btn" data-id="${post.id}">Edit</button>
+                            <button class="btn btn-success btn-small publish-now-btn" data-id="${post.id}">Publish Now</button>
+                            <button class="btn btn-danger btn-small delete-post-btn" data-slug="${post.slug}">Delete</button>
+                        </div>
+                    </td>
+                `;
+                
+                elements.scheduledTableBody.appendChild(row);
+            });
+        }
+
+        async function publishDraft(postId) {
             try {
-                const response = await makeRequest(`/posts/${slug}`, {
-                    method: 'DELETE'
+                // Find the draft
+                const draft = state.drafts.find(d => d.id === postId);
+                if (!draft) return;
+                
+                // Update status to published
+                const formData = new FormData();
+                formData.append('status', 'published');
+                
+                await apiRequest(`/posts/${draft.slug}`, {
+                    method: 'PUT',
+                    body: formData
                 });
                 
-                const data = await response.json();
+                showAlert('Draft published successfully!', 'success');
+                loadDrafts();
+                loadPosts();
                 
-                if (data.success) {
-                    // Reload data
-                    loadPosts(currentPage);
-                    loadDashboardData();
-                    
-                    // If on drafts page, reload drafts
-                    if (draftsManagement.style.display === 'block') {
-                        loadDrafts();
-                    }
-                    
-                    alert('Post deleted successfully');
-                } else {
-                    alert('Error deleting post');
-                }
             } catch (error) {
-                console.error('Error deleting post:', error);
-                alert('Error deleting post');
+                showAlert(`Failed to publish draft: ${error.message}`, 'error');
             }
         }
 
-        // Make functions available globally for onclick handlers
-        window.editPost = editPost;
-        window.deletePost = deletePost;
+        // Taxonomies functions
+        async function loadTaxonomies() {
+            try {
+                // Load artists from posts
+                const postsData = await apiRequest('/posts?limit=100');
+                const uniqueArtists = [...new Set(postsData.posts.map(p => p.artist))];
+                state.artists = uniqueArtists.sort();
+                
+                // Load tags
+                const tagsData = await apiRequest('/tags');
+                state.tags = tagsData.tags;
+                
+                // Load categories
+                const categoriesData = await apiRequest('/categories');
+                state.categories = categoriesData.categories;
+                
+                renderTaxonomies();
+            } catch (error) {
+                showAlert(`Failed to load taxonomies: ${error.message}`, 'error');
+            }
+        }
+
+        function renderTaxonomies() {
+            // Render artists
+            elements.artistsList.innerHTML = '';
+            if (state.artists.length === 0) {
+                elements.artistsList.innerHTML = '<p>No artists found</p>';
+            } else {
+                const artistsHTML = state.artists.map(artist => `
+                    <div style="padding: 0.5rem; border-bottom: 1px solid var(--border);">
+                        <strong>${artist}</strong>
+                        <button class="btn btn-secondary btn-small" style="float: right;" 
+                                onclick="viewArtistPosts('${artist}')">
+                            View Posts
+                        </button>
+                    </div>
+                `).join('');
+                elements.artistsList.innerHTML = artistsHTML;
+            }
+            
+            // Render tags
+            elements.tagsList.innerHTML = '';
+            if (state.tags.length === 0) {
+                elements.tagsList.innerHTML = '<p>No tags found</p>';
+            } else {
+                const tagsHTML = state.tags.map(tag => `
+                    <span class="status-badge" style="margin: 0.25rem; background: var(--light); color: var(--dark);">
+                        ${tag}
+                    </span>
+                `).join('');
+                elements.tagsList.innerHTML = tagsHTML;
+            }
+            
+            // Render categories
+            elements.categoriesList.innerHTML = '';
+            if (state.categories.length === 0) {
+                elements.categoriesList.innerHTML = '<p>No categories found</p>';
+            } else {
+                const categoriesHTML = state.categories.map(category => `
+                    <div style="padding: 0.5rem; border-bottom: 1px solid var(--border);">
+                        ${category}
+                    </div>
+                `).join('');
+                elements.categoriesList.innerHTML = categoriesHTML;
+            }
+        }
+
+        // Edit post functions
+        async function openEditModal(postId) {
+            try {
+                // Find the post
+                const post = state.posts.find(p => p.id === postId) ||
+                             state.drafts.find(p => p.id === postId) ||
+                             state.scheduled.find(p => p.id === postId);
+                
+                if (!post) return;
+                
+                state.editPostId = postId;
+                
+                // Populate form fields
+                elements.editPostId.value = post.id;
+                elements.editTitle.value = post.title;
+                elements.editArtist.value = post.artist;
+                elements.editCategory.value = post.category || '';
+                elements.editTags.value = post.tags?.join(', ') || '';
+                elements.editDescription.value = post.description || '';
+                elements.editStatus.value = post.status;
+                
+                // Clear file previews
+                elements.editAudioPreview.innerHTML = '';
+                elements.editImagePreview.innerHTML = '';
+                
+                // Show existing media if available
+                if (post.audio_url) {
+                    elements.editAudioPreview.innerHTML = `
+                        <div class="preview-item">
+                            <audio controls>
+                                <source src="${post.audio_url}" type="audio/mpeg">
+                            </audio>
+                            <small style="position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.7); color: white; padding: 2px 5px; border-radius: 3px;">
+                                Current
+                            </small>
+                        </div>
+                    `;
+                }
+                
+                if (post.image_url) {
+                    elements.editImagePreview.innerHTML = `
+                        <div class="preview-item">
+                            <img src="${post.image_url}" alt="Current image">
+                            <small style="position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.7); color: white; padding: 2px 5px; border-radius: 3px;">
+                                Current
+                            </small>
+                        </div>
+                    `;
+                }
+                
+                // Show modal
+                elements.editModal.style.display = 'flex';
+                
+            } catch (error) {
+                showAlert(`Failed to load post: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleEditPost(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            
+            // Add text fields
+            formData.append('title', elements.editTitle.value);
+            formData.append('artist', elements.editArtist.value);
+            formData.append('category', elements.editCategory.value);
+            formData.append('tags', elements.editTags.value);
+            formData.append('description', elements.editDescription.value);
+            formData.append('status', elements.editStatus.value);
+            
+            if (elements.editStatus.value === 'scheduled') {
+                formData.append('scheduled_at', elements.editScheduledAt.value);
+            }
+            
+            // Add files if new ones are selected
+            if (elements.editAudioInput.files[0]) {
+                formData.append('audio', elements.editAudioInput.files[0]);
+            }
+            
+            if (elements.editImageInput.files[0]) {
+                formData.append('image', elements.editImageInput.files[0]);
+            }
+            
+            // Show loading state
+            elements.saveEditBtn.innerHTML = '<span class="loading"></span> Saving...';
+            elements.saveEditBtn.disabled = true;
+            
+            try {
+                // Find the post slug
+                const post = state.posts.find(p => p.id === state.editPostId) ||
+                             state.drafts.find(p => p.id === state.editPostId) ||
+                             state.scheduled.find(p => p.id === state.editPostId);
+                
+                await apiRequest(`/posts/${post.slug}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                
+                showAlert('Post updated successfully!', 'success');
+                closeEditModal();
+                
+                // Refresh data
+                if (state.currentPage === 'posts') loadPosts();
+                if (state.currentPage === 'drafts') loadDrafts();
+                
+            } catch (error) {
+                showAlert(`Failed to update post: ${error.message}`, 'error');
+            } finally {
+                elements.saveEditBtn.innerHTML = 'Save Changes';
+                elements.saveEditBtn.disabled = false;
+            }
+        }
+
+        function closeEditModal() {
+            elements.editModal.style.display = 'none';
+            elements.editPostForm.reset();
+            state.editPostId = null;
+        }
+
+        // Delete functions
+        async function confirmDeletePost(slug) {
+            showConfirmationDialog(
+                'Delete Post',
+                'Are you sure you want to delete this post? This action cannot be undone.',
+                () => deletePost(slug)
+            );
+        }
+
+        async function deletePost(slug) {
+            try {
+                await apiRequest(`/posts/${slug}`, {
+                    method: 'DELETE'
+                });
+                
+                showAlert('Post deleted successfully!', 'success');
+                
+                // Refresh data
+                if (state.currentPage === 'posts') loadPosts();
+                if (state.currentPage === 'drafts') loadDrafts();
+                
+            } catch (error) {
+                showAlert(`Failed to delete post: ${error.message}`, 'error');
+            }
+        }
+
+        function confirmBulkDelete() {
+            if (state.selectedPosts.size === 0) return;
+            
+            showConfirmationDialog(
+                'Bulk Delete',
+                `Are you sure you want to delete ${state.selectedPosts.size} selected posts? This action cannot be undone.`,
+                () => bulkDeletePosts()
+            );
+        }
+
+        async function bulkDeletePosts() {
+            try {
+                await apiRequest('/posts/bulk-delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ids: Array.from(state.selectedPosts) })
+                });
+                
+                showAlert(`Successfully deleted ${state.selectedPosts.size} posts!`, 'success');
+                state.selectedPosts.clear();
+                loadPosts();
+                
+            } catch (error) {
+                showAlert(`Failed to delete posts: ${error.message}`, 'error');
+            }
+        }
+
+        // Selection functions
+        function toggleSelectAll() {
+            const checkboxes = document.querySelectorAll('.post-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = elements.selectAll.checked;
+                togglePostSelection({ target: checkbox });
+            });
+        }
+
+        function togglePostSelection(e) {
+            const checkbox = e.target;
+            const postId = checkbox.value;
+            
+            if (checkbox.checked) {
+                state.selectedPosts.add(postId);
+            } else {
+                state.selectedPosts.delete(postId);
+            }
+            
+            updateBulkDeleteButton();
+        }
+
+        function updateBulkDeleteButton() {
+            elements.bulkDeleteBtn.style.display = state.selectedPosts.size > 0 ? 'inline-block' : 'none';
+        }
+
+        // File handling functions
+        function handleAudioUpload() {
+            const file = elements.audioInput.files[0];
+            if (!file) return;
+            
+            elements.audioPreview.innerHTML = `
+                <div class="preview-item">
+                    <audio controls>
+                        <source src="${URL.createObjectURL(file)}" type="${file.type}">
+                    </audio>
+                    <button class="remove-file" onclick="removeAudioFile()">&times;</button>
+                </div>
+            `;
+        }
+
+        function handleImageUpload() {
+            const file = elements.imageInput.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                elements.imagePreview.innerHTML = `
+                    <div class="preview-item">
+                        <img src="${e.target.result}" alt="Preview">
+                        <button class="remove-file" onclick="removeImageFile()">&times;</button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleEditAudioUpload() {
+            const file = elements.editAudioInput.files[0];
+            if (!file) return;
+            
+            elements.editAudioPreview.innerHTML = `
+                <div class="preview-item">
+                    <audio controls>
+                        <source src="${URL.createObjectURL(file)}" type="${file.type}">
+                    </audio>
+                    <button class="remove-file" onclick="removeEditAudioFile()">&times;</button>
+                </div>
+            `;
+        }
+
+        function handleEditImageUpload() {
+            const file = elements.editImageInput.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                elements.editImagePreview.innerHTML = `
+                    <div class="preview-item">
+                        <img src="${e.target.result}" alt="Preview">
+                        <button class="remove-file" onclick="removeEditImageFile()">&times;</button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // File removal functions (exposed globally)
+        window.removeAudioFile = function() {
+            elements.audioPreview.innerHTML = '';
+            elements.audioInput.value = '';
+        };
+
+        window.removeImageFile = function() {
+            elements.imagePreview.innerHTML = '';
+            elements.imageInput.value = '';
+        };
+
+        window.removeEditAudioFile = function() {
+            elements.editAudioPreview.innerHTML = '';
+            elements.editAudioInput.value = '';
+        };
+
+        window.removeEditImageFile = function() {
+            elements.editImagePreview.innerHTML = '';
+            elements.editImageInput.value = '';
+        };
+
+        window.viewArtistPosts = function(artist) {
+            navigateTo('posts');
+            // Filter posts by artist (this would require API support)
+            showAlert(`Showing posts by ${artist}`, 'info');
+        };
+
+        function clearFilePreviews() {
+            removeAudioFile();
+            removeImageFile();
+        }
+
+        // UI helper functions
+        function toggleScheduledField() {
+            elements.scheduledField.style.display = 
+                elements.statusSelect.value === 'scheduled' ? 'block' : 'none';
+        }
+
+        function toggleEditScheduledField() {
+            elements.editScheduledField.style.display = 
+                elements.editStatus.value === 'scheduled' ? 'block' : 'none';
+        }
+
+        function switchTab(tabId) {
+            // Update tabs
+            elements.tabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabId);
+            });
+            
+            // Show selected tab content
+            elements.tabContents.forEach(content => {
+                content.classList.toggle('active', content.id === tabId);
+            });
+        }
+
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'warning'}`;
+            alert.textContent = message;
+            
+            elements.alertContainer.appendChild(alert);
+            alert.style.display = 'block';
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function showLoginAlert(message) {
+            elements.loginAlert.textContent = message;
+            elements.loginAlert.style.display = 'block';
+        }
+
+        function showConfirmationDialog(title, message, callback) {
+            elements.confirmationTitle.textContent = title;
+            elements.confirmationMessage.textContent = message;
+            state.confirmationCallback = callback;
+            elements.confirmationDialog.style.display = 'flex';
+        }
+
+        function closeConfirmationDialog() {
+            elements.confirmationDialog.style.display = 'none';
+            state.confirmationCallback = null;
+        }
+
+        function executeConfirmation() {
+            if (state.confirmationCallback) {
+                state.confirmationCallback();
+            }
+            closeConfirmationDialog();
+        }
+
+        // Initialize the application
+        init();
     </script>
 </body>
 </html>
