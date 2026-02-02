@@ -1,743 +1,1396 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Admin Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        }
+[file name]: untitledChoose.html
+[file content begin]
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+  <title>CMS Dashboard</title>    
+  <style>  
+    * { box-sizing: border-box; max-width: 100%; }  
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f6f7f7; color: #1d2327; overflow-x: hidden; }  
+    a { text-decoration: none; color: inherit; }  
+    button { background: none; border: none; cursor: pointer; font-size: 1rem; }  
+  
+    .topbar { height: 48px; background: #fff; border-bottom:1px solid #dcdcde; display:flex; align-items:center; justify-content:space-between; padding:0 1rem; position:fixed; top:0; left:0; right:0; z-index:1000; }  
+    .topbar .left { display:flex; align-items:center; gap:0.75rem; }  
+    .topbar .title { font-weight:600; font-size:0.95rem; }  
+    .menu-toggle { display:none; }  
+  
+    .sidebar { width:220px; background:#1d2327; color:#fff; position:fixed; top:48px; bottom:0; left:0; padding:1rem 0; overflow-y:auto; }  
+    .sidebar nav a { display:block; padding:0.6rem 1.2rem; font-size:0.9rem; color:#c3c4c7; }  
+    .sidebar nav a.active, .sidebar nav a:hover { background:#2271b1; color:#fff; }  
+    .sidebar .dropdown a { padding-left:1.5rem; font-size:0.85rem; }  
+  
+    .main { margin-left:220px; padding:1.5rem; padding-top:72px; min-height:100vh; }  
+    .page-title { font-size:1.4rem; font-weight:600; margin-bottom:1rem; }  
+    .content-panel { background:#fff; border:1px solid #dcdcde; padding:1.5rem; min-height:300px; }  
+  
+    @media (max-width:768px){  
+      .menu-toggle { display:inline-block; font-size:1.2rem; }  
+      .sidebar { transform:translateX(-100%); transition:transform 0.25s ease; z-index:999; }  
+      .sidebar.open { transform:translateX(0); }  
+      .main { margin-left:0; padding:1rem; padding-top:64px; }  
+    }  
+  
+    input[type="text"], textarea, select, input[type="file"], input[type="date"] { width:100%; max-width:300px; padding:6px; margin-top:4px; margin-bottom:10px; }  
+    button { cursor:pointer; }  
+    
+    /* ===============================
+   10️⃣ THEME / APPEARANCE SWITCHER
+   =============================== */
+body.dark-mode {
+  background: #121212;
+  color: #f0f0f0;
+}
 
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+body.dark-mode .topbar {
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
 
+body.dark-mode .sidebar {
+  background: #1b1b1b;
+  color: #ddd;
+}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+body.dark-mode .sidebar nav a {
+  color: #ccc;
+}
 
-        .hidden {
-            display: none !important;
-        }
+body.dark-mode .sidebar nav a.active,
+body.dark-mode .sidebar nav a:hover {
+  background: #337ab7;
+  color: #fff;
+}
 
-        /* Login Page */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 80vh;
-        }
+body.dark-mode .main .content-panel {
+  background: #1e1e1e;
+  border: 1px solid #333;
+}
 
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-        }
+body.dark-mode button {
+  background: #2a2a2a;
+  color: #fff;
+}
 
-        .login-box h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 28px;
-        }
+/* File Manager Styles */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+.file-card {
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+  padding: 15px;
+  background: #fff;
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
+.file-card img {
+  max-width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
 
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
+.file-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+.file-action-btn {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background: #2271b1;
+  color: white;
+  border: none;
+}
 
-        /* Dashboard */
-        .dashboard {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
+.file-action-btn.delete {
+  background: #dc3232;
+}
 
-        .dashboard-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.file-stats {
+  background: #f0f0f1;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
 
-        .dashboard-header h1 {
-            font-size: 28px;
-        }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
 
-        .logout-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
+.stat-box {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #dcdcde;
+}
 
-        .logout-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2271b1;
+}
 
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            padding: 40px;
-            background: #f8f9fa;
-        }
+.stat-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
 
-        .stat-card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border: 1px solid #e9ecef;
-        }
+/* Audio player */
+.audio-player {
+  margin: 10px 0;
+}
 
-        .stat-card h3 {
-            color: #6c757d;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-        }
+.audio-player audio {
+  width: 100%;
+  max-width: 300px;
+}
+  </style>  
+</head>  
+<body>    
+  <!-- TOP BAR -->    
+  <header class="topbar">  
+    <div class="left">  
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>  
+      <div class="title">CMS Dashboard</div>  
+    </div>  
+    <div class="right">  
+    	<button id="themeToggleBtn">🌙</button>
+      <button onclick="alert('Logout logic goes here')">Logout</button>  
+    </div>  
+  </header>    
+  <!-- SIDEBAR -->    
+  <aside class="sidebar" id="sidebar">  
+    <nav>  
+      <a href="#" class="active" onclick="setPage('Home', this)">Home</a>  
+      <!-- Posts -->  
+      <a href="#" onclick="toggleDropdown('postsDropdown')">Posts ▾</a>  
+      <div id="postsDropdown" class="dropdown" style="display:none;">  
+        <a href="#" onclick="setPage('Posts', this)">All Posts</a>  
+        <a href="#" onclick="setPage('CreatePost', this)">Create Post</a>  
+      </div>  
 
-        .stat-value {
-            font-size: 42px;
-            font-weight: 700;
-            color: #333;
-            margin: 10px 0;
-        }
+      <a href="#" onclick="setPage('File Manager', this)">File Manager</a>  
+      <a href="#" onclick="setPage('Analytics', this)">Analytics</a>  
+      <a href="#" onclick="setPage('Settings', this)">Settings</a>  
 
-        .stat-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.8;
-        }
+      <!-- Albums -->  
+      <a href="#" onclick="toggleDropdown('albumsDropdown')">Albums ▾</a>  
+      <div id="albumsDropdown" class="dropdown" style="display:none;">  
+        <a href="#" onclick="setPage('Albums', this)">All Albums</a>  
+        <a href="#" onclick="setPage('CreateAlbum', this)">Create Album</a>  
+      </div>  
 
-        /* Upload Form */
-        .upload-section {
-            padding: 40px;
-        }
+      <!-- Artists -->  
+      <a href="#" onclick="toggleDropdown('artistsDropdown')">Artists ▾</a>  
+      <div id="artistsDropdown" class="dropdown" style="display:none;">  
+        <a href="#" onclick="setPage('Artists', this)">All Artists</a>  
+        <a href="#" onclick="openCreateArtist(this)">Create Artist</a>  
+      </div>  
+    </nav>
+  </aside>    
 
-        .upload-section h2 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 24px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 15px;
-        }
+  <!-- MAIN CONTENT -->    
+  <main class="main">  
+    <h1 class="page-title" id="pageTitle">Home</h1>  
+    <div class="content-panel">  
+      <!-- HOME -->  
+      <div id="panel-Home">  
+        <p>Welcome to the CMS! This is the Home page.</p>  
+      </div>  
 
-        .upload-form {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
+      <!-- POSTS -->  
+      <div id="panel-Posts" style="display:none;">  
+        <h2>All Posts</h2>  
+        <!-- 🔍 Post Search -->
+        <input
+          type="text"
+          id="postSearchInput"
+          placeholder="Search by title, artist, album, tag..."
+          style="margin-bottom:10px; max-width:300px;"
+          oninput="filterPosts()"
+        />
+        <!-- Filters -->
+        <div id="postFilters" style="margin-bottom:10px;">
+          <select id="filterGenre">
+            <option value="">-- All Genres --</option>
+            <option>Afropop</option>
+            <option>Hip Hop</option>
+            <option>R&B</option>
+            <option>Gospel</option>
+            <option>Reggae</option>
+          </select>
 
-        .form-row {
-            grid-column: span 2;
-        }
+          <select id="filterFeatured">
+            <option value="">-- All Posts --</option>
+            <option value="true">Featured</option>
+            <option value="false">Not Featured</option>
+          </select>
 
-        .form-row:nth-child(5) {
-            grid-column: span 1;
-        }
+          <select id="filterStatus">
+            <option value="">-- All Status --</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
 
-        .form-row:nth-child(6) {
-            grid-column: span 1;
-        }
-
-        .file-input {
-            padding: 15px;
-            border: 2px dashed #e1e5e9;
-            border-radius: 8px;
-            background: #f8f9fa;
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-
-        .file-input:hover {
-            border-color: #667eea;
-        }
-
-        .file-input input {
-            display: none;
-        }
-
-        .file-label {
-            display: block;
-            color: #555;
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        .file-name {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        /* Download Section */
-        .download-section {
-            padding: 40px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .download-section h2 {
-            color: #333;
-            margin-bottom: 25px;
-            font-size: 24px;
-        }
-
-        .download-form {
-            display: flex;
-            gap: 15px;
-            max-width: 600px;
-        }
-
-        .download-form input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .download-form input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        /* Buttons */
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .upload-btn {
-            grid-column: span 2;
-            justify-self: start;
-            margin-top: 10px;
-        }
-
-        /* Messages */
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: none;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .upload-form {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-row {
-                grid-column: span 1;
-            }
-            
-            .upload-btn {
-                grid-column: span 1;
-            }
-            
-            .download-form {
-                flex-direction: column;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Login Section -->
-        <div id="loginSection" class="login-container">
-            <div class="login-box">
-                <h1>Admin Login</h1>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <div id="loginMessage" class="message"></div>
-                    <button type="submit" class="btn" style="width: 100%;">
-                        <span id="loginText">Login</span>
-                        <span id="loginLoading" class="loading hidden"></span>
-                    </button>
-                </form>
-            </div>
+          <input type="date" id="filterDateFrom" placeholder="From Date">
+          <input type="date" id="filterDateTo" placeholder="To Date">
         </div>
 
-        <!-- Dashboard Section -->
-        <div id="dashboardSection" class="dashboard hidden">
-            <!-- Header -->
-            <div class="dashboard-header">
-                <h1>Music Admin Dashboard</h1>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
-            </div>
+        <div id="postsListContainer"></div>  
+      </div>  
 
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">🎵</div>
-                    <h3>Total Songs</h3>
-                    <div id="totalAudios" class="stat-value">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🖼️</div>
-                    <h3>Total Images</h3>
-                    <div id="totalImages" class="stat-value">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📝</div>
-                    <h3>Total Posts</h3>
-                    <div id="totalPosts" class="stat-value">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⬇️</div>
-                    <h3>Total Downloads</h3>
-                    <div id="totalDownloads" class="stat-value">0</div>
-                </div>
-            </div>
+      <div id="panel-CreatePost" style="display:none;">  
+        <h2>Create Post</h2>  
 
-            <!-- Upload Form -->
-            <div class="upload-section">
-                <h2>Upload New Song</h2>
-                <div id="uploadMessage" class="message"></div>
-                <form id="uploadForm" class="upload-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="title">Song Title *</label>
-                            <input type="text" id="title" name="title" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="artist">Artist *</label>
-                            <input type="text" id="artist" name="artist" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="slug">Slug * (URL-friendly name)</label>
-                            <input type="text" id="slug" name="slug" required placeholder="my-awesome-song">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="category">Category</label>
-                            <input type="text" id="category" name="category">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="tags">Tags (comma separated)</label>
-                            <input type="text" id="tags" name="tags" placeholder="rock, pop, indie">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea id="description" name="description"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="file-input">
-                                <input type="file" id="audio" name="audio" accept="audio/*" required>
-                                <span>📁 Select Audio File *</span>
-                                <div id="audioName" class="file-name">No file selected</div>
-                            </label>
-                            <span class="file-label">MP3, WAV, etc. (Max size depends on backend)</span>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="file-input">
-                                <input type="file" id="image" name="image" accept="image/*" required>
-                                <span>🖼️ Select Image File *</span>
-                                <div id="imageName" class="file-name">No file selected</div>
-                            </label>
-                            <span class="file-label">JPG, PNG, etc. (Max size depends on backend)</span>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn upload-btn">
-                        <span id="uploadText">Upload Song</span>
-                        <span id="uploadLoading" class="loading hidden"></span>
-                    </button>
-                </form>
-            </div>
+        <!-- NEW: Post Type Selection -->
+        <p>Post Type:</p>
+        <select id="postTypeSelect" onchange="toggleAlbumSelect()">
+          <option value="single">Single</option>
+          <option value="album">Album</option>
+        </select>
 
-            <!-- Download Section -->
-            <div class="download-section">
-                <h2>Generate Download Link</h2>
-                <p>Enter a song slug to generate a download link (this will increment the download counter)</p>
-                <form id="downloadForm" class="download-form">
-                    <input type="text" id="downloadSlug" placeholder="Enter song slug" required>
-                    <button type="submit" class="btn">Generate Download Link</button>
-                </form>
-                <div id="downloadLinkContainer" class="hidden" style="margin-top: 20px;">
-                    <a id="downloadLink" target="_blank" class="btn" style="display: inline-block;">
-                        Download Song
-                    </a>
-                </div>
-            </div>
+        <p>Upload Thumbnail:</p>  
+        <input type="file" accept="image/*" id="thumbnailInputPosts">  
+        <div id="thumbnailPreviewPosts"></div>  
+
+        <p>Upload Audio:</p>  
+        <input type="file" accept="audio/*" id="audioInputPosts">  
+        <div id="audioPreviewPosts" style="font-size:0.9rem; color:#555;"></div>  
+
+        <p>Post Title:</p>  
+        <input type="text" id="postNameInput" placeholder="Enter post name">  
+
+        <p>Post Description:</p>  
+        <textarea id="postDescriptionInput" placeholder="Enter description / lyrics"></textarea>  
+
+        <!-- Album Select (Conditional) -->
+        <div id="albumSelectContainer">
+          <p>Link to Album:</p>  
+          <select id="postAlbumSelect"><option value="">-- Select Album --</option></select>  
         </div>
-    </div>
 
-    <script>
-        // API Base URL - Change this to your deployed backend URL
-        const API_BASE = 'https://cms.zedtopvibes.workers.dev';
+        <p>Link to Artist:</p>  
+        <select id="postArtistSelect"><option value="">-- Select Artist --</option></select>  
+
+        <p>Genre:</p>  
+        <select id="postGenreSelect">  
+          <option value="">-- Select Genre --</option>  
+          <option>Afropop</option>  
+          <option>Hip Hop</option>  
+          <option>R&B</option>  
+          <option>Gospel</option>  
+          <option>Reggae</option>  
+        </select>  
+
+        <p>Release Date:</p>  
+        <input type="date" id="postReleaseDate">  
+
+        <p>Tags (comma separated):</p>  
+        <input type="text" id="postTagsInput" placeholder="e.g. love, dance, hit">  
+
+        <p>Featured Post:</p>  
+        <input type="checkbox" id="postFeaturedInput"> Yes  
+
+        <p>Optional YouTube / External Link:</p>  
+        <input type="text" id="postExternalLink" placeholder="https://">  
+
+        <!-- Draft or Publish -->
+        <label style="display:block; margin-bottom:8px;">
+          <input type="checkbox" id="postPublishToggle">
+          Publish immediately
+        </label>
+
+        <button onclick="createPost()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">
+          Save Post
+        </button>
+        <button 
+          onclick="publishDraft()" 
+          style="padding:6px 12px; background:#28a745; color:#fff; border-radius:4px; margin-left:5px;">
+          Publish Draft
+        </button>
+      </div>
+
+      <!-- FILE MANAGER -->  
+      <div id="panel-File Manager" style="display:none;">  
+        <h2>File Manager</h2>
         
-        // DOM Elements
-        const loginSection = document.getElementById('loginSection');
-        const dashboardSection = document.getElementById('dashboardSection');
-        const loginForm = document.getElementById('loginForm');
-        const uploadForm = document.getElementById('uploadForm');
-        const downloadForm = document.getElementById('downloadForm');
-        const logoutBtn = document.getElementById('logoutBtn');
+        <!-- Upload Section -->
+        <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f1; border-radius: 8px;">
+          <h3>Upload New File</h3>
+          <input type="file" id="fileUploadInput" multiple>
+          <button onclick="uploadFile()" style="padding: 6px 12px; background: #2271b1; color: #fff; border-radius: 4px; margin-top: 10px;">
+            Upload File(s)
+          </button>
+          <div id="uploadProgress" style="margin-top: 10px;"></div>
+        </div>
+        
+        <!-- File Statistics -->
+        <div id="fileStats" class="file-stats">
+          <h3>Storage Statistics</h3>
+          <div class="stats-grid" id="statsGrid"></div>
+        </div>
+        
+        <!-- File List -->
+        <h3>All Files</h3>
+        <div class="file-grid" id="fileGrid"></div>
+      </div>  
 
-        // State
-        let authToken = localStorage.getItem('authToken');
+      <!-- ANALYTICS -->  
+      <div id="panel-Analytics" style="display:none;">  
+        <p>Analytics placeholder.</p>  
+      </div>  
 
-        // Initialize
-        function init() {
-            checkAuth();
-            setupEventListeners();
-            if (authToken) {
-                loadDashboardData();
-            }
+      <!-- SETTINGS -->  
+      <div id="panel-Settings" style="display:none;">  
+        <h2>Backend Settings</h2>
+        <div style="background: #f0f0f1; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <h3>R2 Storage Configuration</h3>
+          <p><strong>Bucket Name:</strong> <span id="bucketName">media</span></p>
+          <p><strong>Allowed Extensions:</strong> <span id="allowedExtensions">.jpg, .png, .pdf, .zip, .mp4, .mp3</span></p>
+          <p><strong>Streaming Endpoint:</strong> <code>/stream/</code></p>
+          <p><strong>Download Endpoint:</strong> <code>/download/</code></p>
+        </div>
+        
+        <div style="margin-top: 20px;">
+          <h3>Test Backend Connection</h3>
+          <button onclick="testBackendConnection()" style="padding: 6px 12px; background: #2271b1; color: #fff; border-radius: 4px;">
+            Test Connection
+          </button>
+          <div id="connectionTestResult" style="margin-top: 10px;"></div>
+        </div>
+      </div>  
+
+      <!-- ALBUMS -->  
+      <div id="panel-Albums" style="display:none;">  
+        <h2>All Albums</h2>  
+        <div id="albumsListContainer"></div>  
+      </div>  
+
+      <div id="panel-CreateAlbum" style="display:none;">
+        <h2>Create Album</h2>    
+        <p>Album Name:</p>  
+        <input type="text" id="albumNameInput" placeholder="Enter album name">    
+        <p>Album Description:</p>  
+        <textarea id="albumDescriptionInput" placeholder="Enter album description"></textarea>    
+        <p>Upload Thumbnail:</p>  
+        <input type="file" accept="image/*" id="thumbnailInputAlbums">  
+        <div id="thumbnailPreviewAlbums"></div>    
+        <p>Link Posts to Album:</p>  
+        <div id="albumLinkPostsContainer">  
+          <em>No posts yet. Create posts first.</em>  
+        </div>  
+        <button onclick="createAlbum()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">Save Album</button>
+      </div>  
+
+      <!-- ARTISTS -->  
+      <div id="panel-Artists" style="display:none;">  
+        <h2>All Artists</h2>  
+        <div id="artistsListContainer"></div>  
+      </div>  
+
+      <div id="panel-CreateArtist" style="display:none;">  
+        <h2>Create Artist</h2>  
+        <p>Artist Name:</p>  
+        <input type="text" id="artistNameInput" placeholder="Enter artist name">  
+
+        <p>Upload Thumbnail:</p>  
+        <input type="file" accept="image/*" id="thumbnailInputArtists">  
+        <div id="thumbnailPreviewArtists"></div>  
+
+        <p>Biography:</p>  
+        <textarea id="artistBioInput" placeholder="Enter artist biography"></textarea>  
+
+        <p>Social Links:</p>  
+        <input type="text" id="artistInstagramInput" placeholder="Instagram URL">  
+        <input type="text" id="artistTikTokInput" placeholder="TikTok URL">  
+        <input type="text" id="artistYouTubeInput" placeholder="YouTube URL">  
+        <input type="text" id="artistSpotifyInput" placeholder="Spotify URL">  
+
+        <p>Featured Artist:</p>  
+        <input type="checkbox" id="artistFeaturedInput"> Yes  
+        <p>Link existing posts to this Artist:</p>
+        <div id="artistLinkPostsContainer">
+          <em>No posts yet. Create posts first.</em>
+        </div>
+        <button onclick="createArtist()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">Save Artist</button>  
+      </div>  
+    </div>
+  </main>      
+
+<script>
+  // Backend Configuration
+  const BACKEND_URL = 'https://cms.zedtopvibes.workers.dev'; // Your Cloudflare Worker URL
+  const AUTH_TOKEN = 'your-secret-token'; // Must match backend token
+  
+  // ===============================
+  // 1️⃣ SIDEBAR & PAGE SWITCHING
+  // ===============================
+  function toggleSidebar() { 
+    document.getElementById("sidebar").classList.toggle("open"); 
+  }  
+
+  function toggleDropdown(id){ 
+    const el = document.getElementById(id); 
+    el.style.display = el.style.display === 'none' ? 'block' : 'none'; 
+  }  
+
+  function setPage(title, el){  
+    document.getElementById("pageTitle").textContent = title;  
+
+    if(el){
+      document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+      el.classList.add("active");
+    }
+
+    document.getElementById("sidebar").classList.remove("open");  
+    document.querySelectorAll('.content-panel > div').forEach(panel => panel.style.display = 'none');  
+
+    const panel = document.getElementById('panel-' + title);
+    if(panel) panel.style.display = 'block';  
+    
+    if(title === 'Analytics'){
+      renderAnalytics();
+    } else if(title === 'File Manager'){
+      loadFileManager();
+    } else if(title === 'Settings'){
+      // Load backend info
+    }
+
+    // ✅ Reset post search ONLY when Posts page is opened
+    if(title === 'Posts'){
+      const searchInput = document.getElementById('postSearchInput');
+      if(searchInput) searchInput.value = '';
+    }
+  }
+
+  function openCreateArtist(el){
+    setPage('CreateArtist', el);
+    renderArtistLinkPosts();
+  }
+
+  // ===============================
+  // 1️⃣2️⃣ POST TYPE TOGGLE (NEW FUNCTION)
+  // ===============================
+  function toggleAlbumSelect() {
+    const postType = document.getElementById('postTypeSelect').value;
+    const albumContainer = document.getElementById('albumSelectContainer');
+    const albumSelect = document.getElementById('postAlbumSelect');
+    
+    if (postType === 'single') {
+      albumContainer.style.display = 'none';
+      albumSelect.required = false;
+    } else {
+      albumContainer.style.display = 'block';
+      albumSelect.required = true;
+    }
+  }
+
+  // ===============================
+  // 2️⃣ UPLOAD PREVIEWS
+  // ===============================
+  function setupPreview(inputId, previewId, maxWidth=100, maxHeight=100){
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    input.addEventListener('change', e=>{
+      const file=e.target.files[0]; if(!file) return;
+      const reader=new FileReader();
+      reader.onload=()=>{preview.innerHTML=`<img src="${reader.result}" style="max-width:${maxWidth}px; max-height:${maxHeight}px; border:1px solid #ccc; padding:4px;">`;};
+      reader.readAsDataURL(file);
+    });
+  }
+
+  setupPreview('thumbnailInputPosts','thumbnailPreviewPosts',150,150);
+  setupPreview('thumbnailInputAlbums','thumbnailPreviewAlbums',100,100);
+  setupPreview('thumbnailInputArtists','thumbnailPreviewArtists',100,100);
+
+  const audioInputPosts = document.getElementById('audioInputPosts');
+  const audioPreviewPosts = document.getElementById('audioPreviewPosts');
+  audioInputPosts.addEventListener('change', e=>{  
+    const file=e.target.files[0]; if(!file) return;  
+    audioPreviewPosts.textContent=`Selected file: ${file.name}`;  
+  });
+
+  // ===============================
+  // 3️⃣ DUMMY STORAGE
+  // ===============================
+  const postsList = [];
+  const albumsList = [];
+  const artistsList = [];
+  const postAlbumSelect = document.getElementById('postAlbumSelect');  
+  const postArtistSelect = document.getElementById('postArtistSelect');  
+  
+  // ===============================  
+  // 1️⃣1️⃣ Search & Filter Posts  
+  // ===============================
+  function filterPosts() {
+    const query = document.getElementById('postSearchInput').value.toLowerCase();
+    const genreFilter = document.getElementById('filterGenre').value;
+    const featuredFilter = document.getElementById('filterFeatured').value;
+    const statusFilter = document.getElementById('filterStatus').value;
+    const dateFrom = document.getElementById('filterDateFrom').value;
+    const dateTo = document.getElementById('filterDateTo').value;
+
+    const container = document.getElementById('postsListContainer');
+    container.innerHTML = '';
+
+    const filteredPosts = postsList.filter(post => {
+      const matchesQuery =
+        post.title.toLowerCase().includes(query) ||
+        post.artist.toLowerCase().includes(query) ||
+        post.album.toLowerCase().includes(query) ||
+        post.tags.join(',').toLowerCase().includes(query);
+
+      const matchesGenre = genreFilter ? post.genre === genreFilter : true;
+      const matchesFeatured = featuredFilter ? String(post.featured) === featuredFilter : true;
+      const matchesStatus = statusFilter ? post.status === statusFilter : true;
+
+      const matchesDateFrom = dateFrom ? new Date(post.dateCreated) >= new Date(dateFrom) : true;
+      const matchesDateTo = dateTo ? new Date(post.dateCreated) <= new Date(dateTo) : true;
+
+      return matchesQuery && matchesGenre && matchesFeatured && matchesStatus && matchesDateFrom && matchesDateTo;
+    });
+
+    if (!filteredPosts.length) {
+      container.innerHTML = '<em>No matching posts found.</em>';
+      return;
+    }
+
+    filteredPosts.forEach(post => {
+      const div = document.createElement('div');
+      div.style.border = '1px solid #ccc';
+      div.style.padding = '8px';
+      div.style.marginBottom = '8px';
+
+      div.innerHTML = `
+        <strong>${post.title}</strong><br>
+        Type: ${post.type}<br>
+        ${post.album ? `Album: ${post.album}<br>` : ''}
+        Artist: ${post.artist}<br>
+        Genre: ${post.genre || 'N/A'}<br>
+        Status: ${post.status}<br>
+        Tags: ${post.tags.join(', ') || 'N/A'}
+      `;
+
+      container.appendChild(div);
+    });
+  }
+
+  // ===============================
+  // 4️⃣ CREATE / EDIT POSTS (UPDATED with backend upload)
+  // ===============================
+  async function createPost(){  
+    const name = document.getElementById('postNameInput').value.trim();  
+    const postType = document.getElementById('postTypeSelect').value;
+    const album = postType === 'album' ? document.getElementById('postAlbumSelect').value : '';
+    const artist = document.getElementById('postArtistSelect').value;  
+    
+    if(!name){ alert('Post title required'); return; }  
+    if(postType === 'album' && !album){ alert('Please select an album for Album posts'); return; }  
+    if(!artist){ alert('Please select an artist'); return; }  
+
+    const thumbnailFile = document.getElementById('thumbnailInputPosts').files[0];
+    const audioFile = document.getElementById('audioInputPosts').files[0];
+    const description = document.getElementById('postDescriptionInput').value.trim();  
+    const genre = document.getElementById('postGenreSelect').value;  
+    const releaseDate = document.getElementById('postReleaseDate').value;  
+    const tags = document.getElementById('postTagsInput').value.split(',').map(t=>t.trim()).filter(t=>t);  
+    const featured = document.getElementById('postFeaturedInput').checked;  
+    const externalLink = document.getElementById('postExternalLink').value.trim();  
+
+    const publishToggle = document.getElementById('postPublishToggle')?.checked || false;
+    const status = publishToggle ? 'published' : 'draft';
+
+    try {
+      // Upload files to backend
+      let thumbnailUrl = '';
+      let audioUrl = '';
+      
+      if (thumbnailFile) {
+        thumbnailUrl = await uploadToBackend(thumbnailFile, 'thumbnail_');
+      }
+      
+      if (audioFile) {
+        audioUrl = await uploadToBackend(audioFile, 'audio_');
+      }
+
+      const post = { 
+        title: name, 
+        type: postType,
+        album, 
+        artist, 
+        thumbnail: thumbnailUrl,
+        audio: audioUrl,
+        description, 
+        genre, 
+        releaseDate, 
+        tags, 
+        featured, 
+        externalLink,
+        status,
+        dateCreated: new Date().toISOString()
+      };  
+
+      postsList.push(post);  
+
+      alert(`Post "${name}" (${postType}) linked to Artist "${artist}" saved as ${status}!`);  
+
+      ['postNameInput','postDescriptionInput','postGenreSelect','postReleaseDate','postTagsInput','postExternalLink'].forEach(id=>document.getElementById(id).value='');  
+      document.getElementById('postFeaturedInput').checked=false;  
+      document.getElementById('thumbnailInputPosts').value=''; 
+      document.getElementById('audioInputPosts').value='';  
+      document.getElementById('thumbnailPreviewPosts').innerHTML=''; 
+      audioPreviewPosts.textContent='';  
+      if(document.getElementById('postPublishToggle')) document.getElementById('postPublishToggle').checked=false;
+
+      updateAlbumsList();  
+      updateArtistsList();  
+      updatePostsList();  
+      
+    } catch (error) {
+      alert('Error uploading files: ' + error.message);
+    }
+  }
+
+  // ===============================
+  // 4️⃣1️⃣ Publish Draft (UPDATED)
+  // ===============================
+  async function publishDraft() {
+    const name = document.getElementById('postNameInput').value.trim();
+    const postType = document.getElementById('postTypeSelect').value;
+    const album = postType === 'album' ? document.getElementById('postAlbumSelect').value : '';
+    const artist = document.getElementById('postArtistSelect').value;
+
+    if(!name){ alert('Post title required'); return; }
+    if(postType === 'album' && !album){ alert('Please select an album for Album posts'); return; }
+    if(!artist){ alert('Please select an artist'); return; }
+
+    const thumbnailFile = document.getElementById('thumbnailInputPosts').files[0];
+    const audioFile = document.getElementById('audioInputPosts').files[0];
+    const description = document.getElementById('postDescriptionInput').value.trim();
+    const genre = document.getElementById('postGenreSelect').value;
+    const releaseDate = document.getElementById('postReleaseDate').value;
+    const tags = document.getElementById('postTagsInput').value.split(',').map(t=>t.trim()).filter(t=>t);
+    const featured = document.getElementById('postFeaturedInput').checked;
+    const externalLink = document.getElementById('postExternalLink').value.trim();
+
+    const status = 'published';
+
+    try {
+      let thumbnailUrl = '';
+      let audioUrl = '';
+      
+      if (thumbnailFile) {
+        thumbnailUrl = await uploadToBackend(thumbnailFile, 'thumbnail_');
+      }
+      
+      if (audioFile) {
+        audioUrl = await uploadToBackend(audioFile, 'audio_');
+      }
+
+      const post = { 
+        title:name, 
+        type: postType,
+        album, 
+        artist, 
+        thumbnail: thumbnailUrl,
+        audio: audioUrl,
+        description, 
+        genre, 
+        releaseDate, 
+        tags, 
+        featured, 
+        externalLink, 
+        status 
+      };
+
+      postsList.push(post);
+
+      alert(`Post "${name}" (${postType}) published!`);
+
+      ['postNameInput','postDescriptionInput','postGenreSelect','postReleaseDate','postTagsInput','postExternalLink'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('postFeaturedInput').checked=false;
+      document.getElementById('thumbnailInputPosts').value='';
+      document.getElementById('audioInputPosts').value='';
+      document.getElementById('thumbnailPreviewPosts').innerHTML='';
+      audioPreviewPosts.textContent='';
+
+      updateAlbumsList();
+      updateArtistsList();
+      updatePostsList();
+    } catch (error) {
+      alert('Error uploading files: ' + error.message);
+    }
+  }
+
+  // ===============================
+  // 5️⃣ CREATE / EDIT ALBUMS
+  // ===============================
+  let currentEditingAlbumIndex = null;
+
+  function editAlbum(index){
+    currentEditingAlbumIndex = index;
+    const album = albumsList[index];
+    document.getElementById('albumNameInput').value = album.name;
+    document.getElementById('albumDescriptionInput').value = album.description || '';
+    if(album.thumbnail) document.getElementById('thumbnailPreviewAlbums').innerHTML = `<img src="${album.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px;">`;
+    setPage('CreateAlbum', null);
+  }
+
+  async function createAlbum(){
+    const name = document.getElementById('albumNameInput').value.trim();
+    if(!name){ alert('Album name required'); return; }
+    const desc = document.getElementById('albumDescriptionInput').value.trim();
+    const thumbFile = document.getElementById('thumbnailInputAlbums').files[0];
+
+    let thumb = '';
+    if (thumbFile) {
+      try {
+        thumb = await uploadToBackend(thumbFile, 'album_');
+      } catch (error) {
+        alert('Error uploading thumbnail: ' + error.message);
+        return;
+      }
+    }
+
+    if(currentEditingAlbumIndex === null){
+      const album = {name, description:desc, thumbnail:thumb};
+      albumsList.push(album);
+      const option = document.createElement('option'); option.value = name; option.textContent = name; postAlbumSelect.appendChild(option);
+      alert('Album saved!');
+    } else {
+      const album = albumsList[currentEditingAlbumIndex];
+      const oldName = album.name;
+      album.name = name;
+      album.description = desc;
+      album.thumbnail = thumb;
+
+      postsList.forEach(post => { if(post.album === oldName) post.album = name; });
+      const option = Array.from(postAlbumSelect.options).find(o=>o.value===oldName);
+      if(option){ option.value = name; option.textContent = name; }
+      alert('Album updated successfully!');
+      currentEditingAlbumIndex = null;
+    }
+
+    document.getElementById('albumNameInput').value=''; 
+    document.getElementById('albumDescriptionInput').value=''; 
+    document.getElementById('thumbnailInputAlbums').value=''; 
+    document.getElementById('thumbnailPreviewAlbums').innerHTML=''; 
+    updateAlbumsList();
+    updatePostsList();
+  }
+
+  // ===============================
+  // 6️⃣ CREATE / EDIT ARTISTS
+  // ===============================
+  let currentEditingArtistIndex = null;
+
+  function renderArtistLinkPosts(artistName = ''){
+    const container = document.getElementById('artistLinkPostsContainer');
+    container.innerHTML = '';
+    if(!postsList.length){ container.innerHTML='<em>No posts yet. Create posts first.</em>'; return; }
+    postsList.forEach((post,index)=>{
+      const div = document.createElement('div'); div.style.marginBottom='4px';
+      const checkbox = document.createElement('input'); checkbox.type='checkbox'; checkbox.id='linkPostArtist_'+index; checkbox.value=post.title;
+      if(artistName && post.artist===artistName) checkbox.checked=true;
+      const label=document.createElement('label'); label.htmlFor=checkbox.id; label.textContent=` ${post.title} (Album: ${post.album})`;
+      div.appendChild(checkbox); div.appendChild(label); container.appendChild(div);
+    });
+  }
+
+  function editArtist(index){
+    currentEditingArtistIndex = index;
+    const artist = artistsList[index];
+    const artistLinkEl = document.querySelector(".sidebar a[onclick*='openCreateArtist']");
+    openCreateArtist(artistLinkEl);
+
+    document.getElementById('artistNameInput').value = artist.name;
+    document.getElementById('artistBioInput').value = artist.bio || '';
+    document.getElementById('artistInstagramInput').value = artist.instagram || '';
+    document.getElementById('artistTikTokInput').value = artist.tiktok || '';
+    document.getElementById('artistYouTubeInput').value = artist.youtube || '';
+    document.getElementById('artistSpotifyInput').value = artist.spotify || '';
+    document.getElementById('artistFeaturedInput').checked = artist.featured || false;
+    if(artist.thumbnail) document.getElementById('thumbnailPreviewArtists').innerHTML=`<img src="${artist.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px;">`;
+
+    renderArtistLinkPosts(artist.name);
+  }
+
+  async function createArtist(){
+    const name = document.getElementById('artistNameInput').value.trim();
+    if(!name){ alert('Artist name required'); return; }
+
+    const thumbFile = document.getElementById('thumbnailInputArtists').files[0];
+    const bio = document.getElementById('artistBioInput').value.trim();
+    const instagram = document.getElementById('artistInstagramInput').value.trim();
+    const tiktok = document.getElementById('artistTikTokInput').value.trim();
+    const youtube = document.getElementById('artistYouTubeInput').value.trim();
+    const spotify = document.getElementById('artistSpotifyInput').value.trim();
+    const featured = document.getElementById('artistFeaturedInput').checked;
+    const container = document.getElementById('artistLinkPostsContainer');
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+
+    let thumbnail = '';
+    if (thumbFile) {
+      try {
+        thumbnail = await uploadToBackend(thumbFile, 'artist_');
+      } catch (error) {
+        alert('Error uploading thumbnail: ' + error.message);
+        return;
+      }
+    }
+
+    if(currentEditingArtistIndex === null){
+      const artist={name,thumbnail,bio,instagram,tiktok,youtube,spotify,featured};
+      artistsList.push(artist);
+      checkboxes.forEach(cb=>{ if(cb.checked){ const post = postsList.find(p=>p.title===cb.value); if(post) post.artist=name; } });
+      const option = document.createElement('option'); option.value=name; option.textContent=name; postArtistSelect.appendChild(option);
+      alert('Artist saved and linked posts updated!');
+    } else {
+      const artist = artistsList[currentEditingArtistIndex];
+      const oldName = artist.name;
+      artist.name=name; artist.thumbnail=thumbnail; artist.bio=bio; artist.instagram=instagram;
+      artist.tiktok=tiktok; artist.youtube=youtube; artist.spotify=spotify; artist.featured=featured;
+
+      postsList.forEach(post=>{
+        const cb = Array.from(checkboxes).find(c=>c.value===post.title);
+        if(cb?.checked) post.artist=name; else if(post.artist===oldName) post.artist='';
+      });
+
+      const option = Array.from(postArtistSelect.options).find(o=>o.value===oldName);
+      if(option){ option.value=name; option.textContent=name; }
+
+      alert('Artist updated successfully!');
+      currentEditingArtistIndex=null;
+    }
+
+    document.getElementById('artistNameInput').value='';
+    document.getElementById('thumbnailInputArtists').value='';
+    document.getElementById('thumbnailPreviewArtists').innerHTML='';
+    document.getElementById('artistBioInput').value='';
+    document.getElementById('artistInstagramInput').value='';
+    document.getElementById('artistTikTokInput').value='';
+    document.getElementById('artistYouTubeInput').value='';
+    document.getElementById('artistSpotifyInput').value='';
+    document.getElementById('artistFeaturedInput').checked=false;
+
+    renderArtistLinkPosts();
+    updateArtistsList();
+    updatePostsList();
+  }
+
+  // ===============================
+  // 7️⃣ UPDATE POSTS LIST (UPDATED)
+  // ===============================
+  function updatePostsList(){  
+    const container=document.getElementById('postsListContainer'); container.innerHTML='';  
+    postsList.forEach(post=>{  
+      const div=document.createElement('div');  
+      div.style.border='1px solid #ccc'; div.style.padding='8px'; div.style.marginBottom='8px';  
+      div.innerHTML = `<strong>${post.title}</strong> <br>  
+                       Type: ${post.type || 'single'}<br>  
+                       ${post.album ? `Album: ${post.album} <br>` : ''}  
+                       Artist: ${post.artist} <br>  
+                       Genre: ${post.genre || 'N/A'} <br>  
+                       Release: ${post.releaseDate || 'N/A'} <br>  
+                       Tags: ${post.tags.length ? post.tags.join(', ') : 'N/A'} <br>  
+                       Featured: ${post.featured ? 'Yes' : 'No'} <br>  
+                       External Link: ${post.externalLink || 'N/A'} <br>  
+                       Description: ${post.description || 'N/A'} <br>`;  
+      if(post.thumbnail) {
+        if(post.thumbnail.startsWith('http') || post.thumbnail.startsWith('/')) {
+          div.innerHTML += `<img src="${post.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"> <br>`;  
+        } else {
+          // Display from backend
+          div.innerHTML += `<img src="${BACKEND_URL}/download/${post.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"> <br>`;  
+        }
+      }
+      if(post.audio) {
+        if(post.audio.startsWith('http') || post.audio.startsWith('/')) {
+          div.innerHTML += `<div class="audio-player"><audio controls><source src="${post.audio}" type="audio/mpeg">Your browser does not support audio.</audio></div><br>`;  
+        } else {
+          // Stream from backend
+          div.innerHTML += `<div class="audio-player"><audio controls><source src="${BACKEND_URL}/stream/${post.audio}" type="audio/mpeg">Your browser does not support audio.</audio></div><br>`;  
+        }
+      }
+      container.appendChild(div);  
+    });  
+  }
+  
+  // ===============================
+  // 8️⃣ UNLINK POSTS WITHOUT DELETING
+  // ===============================
+
+  function unlinkAlbumPosts(index){
+    const album = albumsList[index];
+    if(!confirm(`Are you sure you want to unlink all posts from album "${album.name}"? This will not delete the posts.`)) return;
+
+    postsList.forEach(post => { if(post.album === album.name) post.album = ''; });
+
+    const option = Array.from(postAlbumSelect.options).find(o=>o.value===album.name);
+    if(option) option.selected = false;
+
+    updateAlbumsList();
+    updatePostsList();
+    alert(`All posts unlinked from album "${album.name}".`);
+  }
+
+  function unlinkArtistPosts(index){
+    const artist = artistsList[index];
+    if(!confirm(`Are you sure you want to unlink all posts from artist "${artist.name}"? This will not delete the posts.`)) return;
+
+    postsList.forEach(post => { if(post.artist === artist.name) post.artist = ''; });
+
+    const option = Array.from(postArtistSelect.options).find(o=>o.value===artist.name);
+    if(option) option.selected = false;
+
+    updateArtistsList();
+    updatePostsList();
+    alert(`All posts unlinked from artist "${artist.name}".`);
+  }
+
+  function updateAlbumsList(){
+    const container=document.getElementById('albumsListContainer'); container.innerHTML='';
+    albumsList.forEach((album,index)=>{
+      const div=document.createElement('div');   
+      div.style.border='1px solid #ccc'; div.style.padding='8px'; div.style.marginBottom='8px';
+      div.innerHTML = `<strong>${album.name}</strong><br>${album.description || ''}<br>`;
+      if(album.thumbnail) {
+        if(album.thumbnail.startsWith('http') || album.thumbnail.startsWith('/')) {
+          div.innerHTML += `<img src="${album.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`;
+        } else {
+          div.innerHTML += `<img src="${BACKEND_URL}/download/${album.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`;
+        }
+      }
+      const linkedPosts = postsList.filter(p=>p.album===album.name);
+      if(linkedPosts.length){
+        const ul=document.createElement('ul'); linkedPosts.forEach(p=>{ const li=document.createElement('li'); li.textContent=`${p.title} (Artist: ${p.artist})`; ul.appendChild(li); });
+        div.innerHTML+='<strong>Linked Posts:</strong><br>'; div.appendChild(ul);
+      } else div.innerHTML+='<em>No linked posts yet.</em>';
+
+      const editBtn = document.createElement('button'); editBtn.textContent='Edit'; 
+      editBtn.style.marginTop='6px'; editBtn.style.marginRight='4px';
+      editBtn.style.padding='4px 8px'; editBtn.style.background='#2271b1'; editBtn.style.color='#fff'; editBtn.style.borderRadius='4px';
+      editBtn.onclick = ()=> editAlbum(index);
+      div.appendChild(editBtn);
+
+      const unlinkBtn = document.createElement('button'); unlinkBtn.textContent='Unlink Posts';
+      unlinkBtn.style.marginTop='6px'; unlinkBtn.style.padding='4px 8px'; unlinkBtn.style.background='#b12222'; unlinkBtn.style.color='#fff'; unlinkBtn.style.borderRadius='4px';
+      unlinkBtn.onclick = ()=> unlinkAlbumPosts(index);
+      div.appendChild(unlinkBtn);
+
+      container.appendChild(div);
+    });
+  }
+
+  function updateArtistsList(){
+    const container=document.getElementById('artistsListContainer'); container.innerHTML='';
+    artistsList.forEach((artist,index)=>{
+      const div=document.createElement('div'); div.style.border='1px solid #ccc'; div.style.padding='8px'; div.style.marginBottom='8px';
+      div.innerHTML=`<strong>${artist.name}</strong><br>`+
+                    (artist.thumbnail ? 
+                      (artist.thumbnail.startsWith('http') || artist.thumbnail.startsWith('/') ?
+                        `<img src="${artist.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>` :
+                        `<img src="${BACKEND_URL}/download/${artist.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`) 
+                      : '')+
+                    (artist.bio?`<em>Bio:</em> ${artist.bio}<br>`:'')+
+                    (artist.instagram?`Instagram: <a href="${artist.instagram}" target="_blank">${artist.instagram}</a><br>`:'')+
+                    (artist.tiktok?`TikTok: <a href="${artist.tiktok}" target="_blank">${artist.tiktok}</a><br>`:'')+
+                    (artist.youtube?`YouTube: <a href="${artist.youtube}" target="_blank">${artist.youtube}</a><br>`:'')+
+                    (artist.spotify?`Spotify: <a href="${artist.spotify}" target="_blank">${artist.spotify}</a><br>`:'')+
+                    `Featured: ${artist.featured?'Yes':'No'}<br>`;
+      const linkedPosts=postsList.filter(p=>p.artist===artist.name);
+      if(linkedPosts.length){ const ul=document.createElement('ul'); linkedPosts.forEach(p=>{ const li=document.createElement('li'); li.textContent=`${p.title} (Album: ${p.album})`; ul.appendChild(li); }); div.innerHTML+='<strong>Linked Posts:</strong><br>'; div.appendChild(ul);} 
+      else div.innerHTML+='<em>No linked posts yet.</em>';
+
+      const editBtn = document.createElement('button'); editBtn.textContent='Edit'; editBtn.style.marginTop='6px'; editBtn.style.marginRight='4px'; editBtn.style.padding='4px 8px';
+      editBtn.style.background='#2271b1'; editBtn.style.color='#fff'; editBtn.style.borderRadius='4px'; editBtn.onclick=()=>editArtist(index);
+      div.appendChild(editBtn);
+
+      const unlinkBtn = document.createElement('button'); unlinkBtn.textContent='Unlink Posts';
+      unlinkBtn.style.marginTop='6px'; unlinkBtn.style.padding='4px 8px'; unlinkBtn.style.background='#b12222'; unlinkBtn.style.color='#fff'; unlinkBtn.style.borderRadius='4px';
+      unlinkBtn.onclick = ()=> unlinkArtistPosts(index);
+      div.appendChild(unlinkBtn);
+
+      container.appendChild(div);
+    });
+  }
+
+  // ===============================
+  // 9️⃣ BULK RELINK POSTS TO ALBUM/ARTIST
+  // ===============================
+
+  function openBulkRelink(){
+    const container = document.getElementById('postsListContainer');
+    if(!postsList.length){ alert('No posts to relink.'); return; }
+
+    container.innerHTML = '<h3>Bulk Relink Posts</h3>';
+
+    postsList.forEach((post, index)=>{
+      const div = document.createElement('div');
+      div.style.marginBottom = '4px';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = 'bulkPost_' + index;
+      checkbox.value = post.title;
+
+      const label = document.createElement('label');
+      label.htmlFor = checkbox.id;
+      label.textContent = ` ${post.title} (Album: ${post.album || 'N/A'}, Artist: ${post.artist || 'N/A'})`;
+
+      div.appendChild(checkbox);
+      div.appendChild(label);
+      container.appendChild(div);
+    });
+
+    const albumSelect = document.createElement('select');
+    albumSelect.id = 'bulkAlbumSelect';
+    const defaultOptionA = document.createElement('option');
+    defaultOptionA.value = '';
+    defaultOptionA.textContent = '-- Select Album to Relink --';
+    albumSelect.appendChild(defaultOptionA);
+    albumsList.forEach(a=>{
+      const opt = document.createElement('option'); opt.value = a.name; opt.textContent = a.name; albumSelect.appendChild(opt);
+    });
+    container.appendChild(document.createElement('br'));
+    container.appendChild(albumSelect);
+
+    const artistSelect = document.createElement('select');
+    artistSelect.id = 'bulkArtistSelect';
+    const defaultOptionR = document.createElement('option');
+    defaultOptionR.value = '';
+    defaultOptionR.textContent = '-- Select Artist to Relink --';
+    artistSelect.appendChild(defaultOptionR);
+    artistsList.forEach(ar=>{
+      const opt = document.createElement('option'); opt.value = ar.name; opt.textContent = ar.name; artistSelect.appendChild(opt);
+    });
+    container.appendChild(document.createElement('br'));
+    container.appendChild(artistSelect);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.textContent = 'Apply Relink';
+    applyBtn.style.marginTop = '6px';
+    applyBtn.style.padding = '6px 12px';
+    applyBtn.style.background = '#2271b1';
+    applyBtn.style.color = '#fff';
+    applyBtn.style.borderRadius = '4px';
+    applyBtn.onclick = applyBulkRelink;
+
+    container.appendChild(document.createElement('br'));
+    container.appendChild(applyBtn);
+  }
+
+  function applyBulkRelink(){
+    const selectedPosts = Array.from(document.querySelectorAll('#postsListContainer input[type="checkbox"]:checked'));
+    if(!selectedPosts.length){ alert('Select at least one post'); return; }
+
+    const album = document.getElementById('bulkAlbumSelect').value;
+    const artist = document.getElementById('bulkArtistSelect').value;
+
+    selectedPosts.forEach(cb=>{
+      const post = postsList.find(p=>p.title===cb.value);
+      if(post){
+        if(album) post.album = album;
+        if(artist) post.artist = artist;
+      }
+    });
+
+    alert('Selected posts updated successfully!');
+    updateAlbumsList();
+    updateArtistsList();
+    updatePostsList();
+  }
+
+  // Add button to Posts panel
+  const postsPanel = document.getElementById('panel-Posts');
+  const bulkBtn = document.createElement('button');
+  bulkBtn.textContent = 'Bulk Relink Posts';
+  bulkBtn.style.marginBottom = '10px';
+  bulkBtn.style.padding = '6px 12px';
+  bulkBtn.style.background = '#22b17d';
+  bulkBtn.style.color = '#fff';
+  bulkBtn.style.borderRadius = '4px';
+  bulkBtn.onclick = openBulkRelink;
+  postsPanel.insertBefore(bulkBtn, postsPanel.firstChild);
+
+  // ===============================
+  // 🔟 BACKEND INTEGRATION FUNCTIONS
+  // ===============================
+
+  async function uploadToBackend(file, prefix = '') {
+    const formData = new FormData();
+    const timestamp = Date.now();
+    const filename = prefix + timestamp + '_' + file.name;
+    formData.append('file', file);
+    formData.append('filename', filename);
+
+    const response = await fetch(`${BACKEND_URL}/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${AUTH_TOKEN}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.filename;
+  }
+
+  async function uploadFile() {
+    const fileInput = document.getElementById('fileUploadInput');
+    const files = fileInput.files;
+    
+    if (files.length === 0) {
+      alert('Please select files to upload');
+      return;
+    }
+
+    const progressDiv = document.getElementById('uploadProgress');
+    progressDiv.innerHTML = '<p>Uploading files...</p>';
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        progressDiv.innerHTML += `<p>Uploading ${file.name}...</p>`;
+        await uploadToBackend(file);
+        progressDiv.innerHTML += `<p style="color: green;">✓ ${file.name} uploaded successfully</p>`;
+      } catch (error) {
+        progressDiv.innerHTML += `<p style="color: red;">✗ ${file.name} failed: ${error.message}</p>`;
+      }
+    }
+
+    // Refresh file list
+    loadFileManager();
+    
+    // Clear file input
+    fileInput.value = '';
+  }
+
+  async function loadFileManager() {
+    try {
+      const response = await fetch(`${BACKEND_URL}/files`);
+      if (!response.ok) throw new Error('Failed to load files');
+      
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Unknown error');
+
+      // Update stats
+      const statsGrid = document.getElementById('statsGrid');
+      statsGrid.innerHTML = `
+        <div class="stat-box">
+          <div class="stat-value">${data.total_files}</div>
+          <div class="stat-label">Total Files</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${data.total_downloads}</div>
+          <div class="stat-label">Total Downloads</div>
+        </div>
+      `;
+
+      // Update file grid
+      const fileGrid = document.getElementById('fileGrid');
+      fileGrid.innerHTML = '';
+
+      data.files.forEach(file => {
+        const fileCard = document.createElement('div');
+        fileCard.className = 'file-card';
+        
+        let preview = '';
+        const ext = file.key.split('.').pop().toLowerCase();
+        
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+          preview = `<img src="${BACKEND_URL}/download/${file.key}" alt="${file.key}">`;
+        } else if (ext === 'mp3') {
+          preview = `<div class="audio-player"><audio controls><source src="${BACKEND_URL}/stream/${file.key}" type="audio/mpeg"></audio></div>`;
+        } else {
+          preview = `<div style="text-align: center; padding: 20px; background: #f0f0f1; border-radius: 4px;">
+            <strong>${ext.toUpperCase()}</strong><br>
+            <small>${file.key}</small>
+          </div>`;
         }
 
-        // Authentication Check
-        function checkAuth() {
-            if (authToken) {
-                showDashboard();
-            } else {
-                showLogin();
-            }
-        }
+        fileCard.innerHTML = `
+          ${preview}
+          <div style="margin-top: 10px;">
+            <strong>${file.key}</strong><br>
+            <small>Size: ${formatFileSize(file.size)}</small><br>
+            <small>Downloads: ${file.downloads}</small>
+          </div>
+          <div class="file-actions">
+            <button class="file-action-btn" onclick="copyLink('${file.key}')">Copy Link</button>
+            <button class="file-action-btn" onclick="downloadFile('${file.key}')">Download</button>
+            <button class="file-action-btn delete" onclick="deleteFile('${file.key}')">Delete</button>
+          </div>
+        `;
 
-        // Show/Hide Sections
-        function showLogin() {
-            loginSection.classList.remove('hidden');
-            dashboardSection.classList.add('hidden');
-        }
+        fileGrid.appendChild(fileCard);
+      });
 
-        function showDashboard() {
-            loginSection.classList.add('hidden');
-            dashboardSection.classList.remove('hidden');
-        }
+    } catch (error) {
+      console.error('Error loading files:', error);
+      document.getElementById('fileGrid').innerHTML = `<p style="color: red;">Error loading files: ${error.message}</p>`;
+    }
+  }
 
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Login Form
-            loginForm.addEventListener('submit', handleLogin);
-            
-            // Logout Button
-            logoutBtn.addEventListener('click', handleLogout);
-            
-            // Upload Form
-            uploadForm.addEventListener('submit', handleUpload);
-            
-            // Download Form
-            downloadForm.addEventListener('submit', handleDownload);
-            
-            // File Input Displays
-            document.getElementById('audio').addEventListener('change', (e) => {
-                document.getElementById('audioName').textContent = e.target.files[0]?.name || 'No file selected';
-            });
-            
-            document.getElementById('image').addEventListener('change', (e) => {
-                document.getElementById('imageName').textContent = e.target.files[0]?.name || 'No file selected';
-            });
-        }
+  function copyLink(filename) {
+    const link = `${BACKEND_URL}/download/${filename}`;
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Link copied to clipboard!');
+    });
+  }
 
-        // Login Handler
-        async function handleLogin(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = e.target.querySelector('.btn');
-            const loginText = document.getElementById('loginText');
-            const loginLoading = document.getElementById('loginLoading');
-            const message = document.getElementById('loginMessage');
-            
-            // Show loading
-            loginBtn.disabled = true;
-            loginText.textContent = 'Logging in...';
-            loginLoading.classList.remove('hidden');
-            message.classList.remove('success', 'error');
-            message.textContent = '';
-            
-            try {
-                const response = await fetch(`${API_BASE}/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success && data.token) {
-                    authToken = data.token;
-                    localStorage.setItem('authToken', authToken);
-                    message.textContent = 'Login successful!';
-                    message.classList.add('success');
-                    
-                    setTimeout(() => {
-                        showDashboard();
-                        loadDashboardData();
-                        loginForm.reset();
-                    }, 1000);
-                } else {
-                    throw new Error(data.message || 'Invalid credentials');
-                }
-            } catch (error) {
-                message.textContent = error.message;
-                message.classList.add('error');
-            } finally {
-                loginBtn.disabled = false;
-                loginText.textContent = 'Login';
-                loginLoading.classList.add('hidden');
-            }
-        }
+  function downloadFile(filename) {
+    window.open(`${BACKEND_URL}/download/${filename}`, '_blank');
+  }
 
-        // Logout Handler
-        function handleLogout() {
-            authToken = null;
-            localStorage.removeItem('authToken');
-            showLogin();
-        }
+  async function deleteFile(filename) {
+    if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
+    
+    // Note: Your backend doesn't have a delete endpoint yet
+    // You would need to add one to your worker
+    alert('Delete functionality requires adding DELETE endpoint to backend');
+  }
 
-        // Load Dashboard Data (Totals)
-        async function loadDashboardData() {
-            try {
-                const response = await fetch(`${API_BASE}/totals`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('totalAudios').textContent = data.totalAudios;
-                    document.getElementById('totalImages').textContent = data.totalImages;
-                    document.getElementById('totalPosts').textContent = data.totalPosts;
-                    document.getElementById('totalDownloads').textContent = data.totalDownloads;
-                }
-            } catch (error) {
-                console.error('Failed to load dashboard data:', error);
-            }
-        }
+  async function testBackendConnection() {
+    const resultDiv = document.getElementById('connectionTestResult');
+    resultDiv.innerHTML = '<p>Testing connection...</p>';
+    
+    try {
+      const response = await fetch(BACKEND_URL);
+      if (response.ok) {
+        resultDiv.innerHTML = '<p style="color: green;">✓ Backend connection successful!</p>';
+      } else {
+        resultDiv.innerHTML = `<p style="color: red;">✗ Backend returned status: ${response.status}</p>`;
+      }
+    } catch (error) {
+      resultDiv.innerHTML = `<p style="color: red;">✗ Connection failed: ${error.message}</p>`;
+    }
+  }
 
-        // Upload Handler
-        async function handleUpload(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const formData = new FormData(form);
-            const uploadBtn = form.querySelector('.btn');
-            const uploadText = document.getElementById('uploadText');
-            const uploadLoading = document.getElementById('uploadLoading');
-            const message = document.getElementById('uploadMessage');
-            
-            // Validate required fields
-            const requiredFields = ['title', 'artist', 'slug', 'audio', 'image'];
-            for (const field of requiredFields) {
-                const value = field === 'audio' || field === 'image' 
-                    ? document.getElementById(field).files[0]
-                    : document.getElementById(field).value;
-                
-                if (!value) {
-                    message.textContent = `Please fill in all required fields (*)`;
-                    message.classList.add('error');
-                    return;
-                }
-            }
-            
-            // Show loading
-            uploadBtn.disabled = true;
-            uploadText.textContent = 'Uploading...';
-            uploadLoading.classList.remove('hidden');
-            message.classList.remove('success', 'error');
-            message.textContent = '';
-            
-            try {
-                const response = await fetch(`${API_BASE}/posts`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': authToken
-                    },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.message || 'Upload failed');
-                }
-                
-                if (data.success) {
-                    message.textContent = `Song "${data.post.title}" uploaded successfully!`;
-                    message.classList.add('success');
-                    
-                    form.reset();
-                    document.getElementById('audioName').textContent = 'No file selected';
-                    document.getElementById('imageName').textContent = 'No file selected';
-                    
-                    // Reload dashboard data
-                    setTimeout(() => loadDashboardData(), 1000);
-                } else {
-                    throw new Error(data.message || 'Upload failed');
-                }
-            } catch (error) {
-                message.textContent = error.message;
-                message.classList.add('error');
-            } finally {
-                uploadBtn.disabled = false;
-                uploadText.textContent = 'Upload Song';
-                uploadLoading.classList.add('hidden');
-            }
-        }
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
 
-        // Download Handler
-        async function handleDownload(e) {
-            e.preventDefault();
-            
-            const slug = document.getElementById('downloadSlug').value.trim();
-            const linkContainer = document.getElementById('downloadLinkContainer');
-            const downloadLink = document.getElementById('downloadLink');
-            
-            if (!slug) {
-                alert('Please enter a song slug');
-                return;
-            }
-            
-            try {
-                // Note: The backend redirects, so we need to handle this specially
-                // We'll create a link that the user can click
-                const downloadUrl = `${API_BASE}/download/${encodeURIComponent(slug)}`;
-                downloadLink.href = downloadUrl;
-                downloadLink.textContent = `Download ${slug}`;
-                linkContainer.classList.remove('hidden');
-                
-                // We can't automatically increment without actually downloading
-                // The backend will increment when the link is clicked
-            } catch (error) {
-                alert('Failed to generate download link: ' + error.message);
-            }
-        }
+  // ===============================
+  // 1️⃣1️⃣ THEME / APPEARANCE SWITCHER
+  // ===============================
+  
+  const themeBtn = document.getElementById('themeToggleBtn');
+  
+  const currentTheme = localStorage.getItem('cmsTheme');
+  if(currentTheme === 'dark') document.body.classList.add('dark-mode');
+  
+  themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    if(document.body.classList.contains('dark-mode')) {
+      localStorage.setItem('cmsTheme','dark');
+      themeBtn.textContent = '☀️';
+    } else {
+      localStorage.setItem('cmsTheme','light');
+      themeBtn.textContent = '🌙';
+    }
+  });
+  
+  if(document.body.classList.contains('dark-mode')) themeBtn.textContent = '☀️';
+  else themeBtn.textContent = '🌙';
 
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
-</body>
+  // ===============================
+  // 1️⃣2️⃣ ANALYTICS
+  // ===============================
+  function renderAnalytics() {
+    const container = document.getElementById('panel-Analytics');
+    container.innerHTML = ''; // Clear placeholder
+
+    // ===== Stats =====
+    const totalPosts = postsList.length;
+    const publishedPosts = postsList.filter(p => p.status === 'published').length;
+    const draftPosts = postsList.filter(p => p.status === 'draft').length;
+    const featuredPosts = postsList.filter(p => p.featured).length;
+
+    const totalAlbums = albumsList.length;
+    const totalArtists = artistsList.length;
+
+    // ===== Analytics HTML =====
+    const statsHTML = document.createElement('div');
+    statsHTML.innerHTML = `
+      <h2>Analytics Overview</h2>
+      <div style="display:flex; flex-wrap:wrap; gap:20px; margin-bottom:20px;">
+        <div style="border:1px solid #ccc; padding:10px; border-radius:6px; flex:1 1 150px;">
+          <strong>Total Posts</strong><br>${totalPosts}
+        </div>
+        <div style="border:1px solid #ccc; padding:10px; border-radius:6px; flex:1 1 150px;">
+          <strong>Published</strong><br>${publishedPosts}
+        </div>
+        <div style="border:1px solid #ccc; padding:10px; border-radius:6px; flex:1 1 150px;">
+          <strong>Draft</strong><br>${draftPosts}
+        </div>
+        <div style="border:1px solid #ccc; padding:10px; border-radius:6px; flex:1 1 150px;">
+          <strong>Featured</strong><br>${featuredPosts}
+        </div>
+        <div style="border:1px solid #ccc; padding:10px; border-radius:6px; flex:1 1 150px;">
+          <strong>Total Albums</strong><br>${totalAlbums}
+        </div>
+        <div style="border:1px solid #ccc; padding:10px; border-radius:6px; flex:1 1 150px;">
+          <strong>Total Artists</strong><br>${totalArtists}
+        </div>
+      </div>
+      <h3>Recent Posts</h3>
+      <ul id="recentPostsList" style="list-style:disc; padding-left:20px;"></ul>
+    `;
+    container.appendChild(statsHTML);
+
+    // ===== Recent Posts =====
+    const recentPostsList = document.getElementById('recentPostsList');
+    const recentPosts = postsList.slice(-5).reverse(); // last 5 posts
+    if(!recentPosts.length){
+      recentPostsList.innerHTML = '<em>No posts yet.</em>';
+      return;
+    }
+    recentPosts.forEach(post => {
+      const li = document.createElement('li');
+      li.textContent = `${post.title} (Album: ${post.album || 'N/A'}, Artist: ${post.artist || 'N/A'}, Status: ${post.status}, Date: ${post.dateCreated?.split('T')[0] || 'N/A'})`;
+      recentPostsList.appendChild(li);
+    });
+  }
+
+  // ===============================
+  // INITIALIZE
+  // ===============================
+  updateAlbumsList();  
+  updateArtistsList();  
+  updatePostsList();
+  
+  // Initialize post type toggle on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    toggleAlbumSelect(); // Set initial state
+    
+    // Test backend connection on load
+    setTimeout(() => {
+      testBackendConnection();
+    }, 1000);
+  });
+</script>
+</body>  
 </html>
