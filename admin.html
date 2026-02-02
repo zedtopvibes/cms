@@ -1,66 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CMS Admin</title>
-  <style>
-    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 2rem; }
-    input, button { padding: 0.5rem; margin: 0.5rem 0; width: 200px; }
-    .hidden { display: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS Admin Dashboard</title>
+<style>
+body { font-family: Arial; margin: 20px; }
+form { margin-bottom: 30px; }
+input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
+button { padding: 5px 10px; }
+#status { margin-top: 10px; color: green; }
+</style>
 </head>
 <body>
-  <h1>CMS Admin Login</h1>
-  <div id="login-form">
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <p id="error" style="color:red;"></p>
-  </div>
 
-  <div id="dashboard" class="hidden">
-    <h2>Dashboard</h2>
-    <button onclick="logout()">Logout</button>
-    <div id="content"></div>
-  </div>
+<h2>Admin Login</h2>
+<form id="loginForm">
+  <input type="text" name="username" placeholder="Username" required />
+  <input type="password" name="password" placeholder="Password" required />
+  <button type="submit">Login</button>
+</form>
 
-  <script>
-    const API_URL = "https://cms.zedtopvibes.workers.dev";
+<script>
+let token = "";
 
-    async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+// ===== Login Form =====
+document.getElementById("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const form = e.target;
+  const data = {
+    username: form.username.value,
+    password: form.password.value
+  };
 
-      const res = await fetch(`${API_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include"
-      });
+  const res = await fetch("https://cms.zedtopvibes.workers.dev/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
-      const data = await res.json();
-      if(data.success){
-        document.getElementById('login-form').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadContent();
-      } else {
-        document.getElementById('error').textContent = data.error;
-      }
-    }
+  const result = await res.json();
+  if (result.success) {
+    token = result.token;
+    document.getElementById("status").innerText = "Login successful!";
+    form.style.display = "none";
+    document.getElementById("postForm").style.display = "block";
+  } else {
+    document.getElementById("status").innerText = "Login failed: " + result.message;
+  }
+});
 
-    async function logout() {
-      await fetch(`${API_URL}/api/logout`, { method: "POST", credentials: "include" });
-      document.getElementById('login-form').classList.remove('hidden');
-      document.getElementById('dashboard').classList.add('hidden');
-    }
+</script>
 
-    async function loadContent() {
-      const res = await fetch(`${API_URL}/api/posts`, { credentials: "include" });
-      const data = await res.json();
-      const contentDiv = document.getElementById('content');
-      contentDiv.innerHTML = "<h3>Posts:</h3>" + JSON.stringify(data.posts, null, 2);
-    }
-  </script>
 </body>
 </html>
