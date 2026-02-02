@@ -1,91 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>CMS Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body {
-  font-family: system-ui;
-  background: #0f172a;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-.card {
-  background: #020617;
-  padding: 30px;
-  width: 320px;
-  border-radius: 10px;
-}
-input, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-}
-button {
-  background: #22c55e;
-  border: none;
-  color: #000;
-  font-weight: bold;
-}
-.error {
-  color: #ef4444;
-  margin-top: 10px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS Admin</title>
+  <style>
+    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 2rem; }
+    input, button { padding: 0.5rem; margin: 0.5rem 0; width: 200px; }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
+  <h1>CMS Admin Login</h1>
+  <div id="login-form">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="error" style="color:red;"></p>
+  </div>
 
-<div class="card" id="loginBox">
-  <h2>Admin Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <div class="error" id="error"></div>
-</div>
+  <div id="dashboard" class="hidden">
+    <h2>Dashboard</h2>
+    <button onclick="logout()">Logout</button>
+    <div id="content"></div>
+  </div>
 
-<script>
-const API = "https://cms.zedtopvibes.workers.dev";
+  <script>
+    const API_URL = "https://cms.zedtopvibes.workers.dev";
 
-async function login() {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-  const res = await fetch(API + "/api/login", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
+      const res = await fetch(`${API_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include"
+      });
 
-  const data = await res.json();
+      const data = await res.json();
+      if(data.success){
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadContent();
+      } else {
+        document.getElementById('error').textContent = data.error;
+      }
+    }
 
-  if (res.ok) {
-    location.reload();
-  } else {
-    error.textContent = data.error || "Login failed";
-  }
-}
+    async function logout() {
+      await fetch(`${API_URL}/api/logout`, { method: "POST", credentials: "include" });
+      document.getElementById('login-form').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+    }
 
-async function checkAuth() {
-  const res = await fetch(API + "/api/me", {
-    credentials: "include"
-  });
-
-  if (res.ok) {
-    document.body.innerHTML = "<h1>✅ Logged in</h1>";
-  }
-}
-
-checkAuth();
-
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const error = document.getElementById("error");
-</script>
-
+    async function loadContent() {
+      const res = await fetch(`${API_URL}/api/posts`, { credentials: "include" });
+      const data = await res.json();
+      const contentDiv = document.getElementById('content');
+      contentDiv.innerHTML = "<h3>Posts:</h3>" + JSON.stringify(data.posts, null, 2);
+    }
+  </script>
 </body>
 </html>
