@@ -51,7 +51,7 @@ button {
 const API = "https://cms.zedtopvibes.workers.dev";
 
 async function login() {
-  const email = emailInput.value;
+  const email = emailInput.value.trim();
   const password = passwordInput.value;
 
   const res = await fetch(API + "/api/login", {
@@ -61,10 +61,12 @@ async function login() {
     body: JSON.stringify({ email, password })
   });
 
+  const data = await res.json();
+
   if (res.ok) {
     location.reload();
   } else {
-    error.textContent = "Login failed";
+    error.textContent = data.error || "Login failed";
   }
 }
 
