@@ -5,51 +5,74 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMS Admin Dashboard</title>
 <style>
-body { font-family: Arial; margin: 20px; }
-form { margin-bottom: 30px; }
+body { font-family: Arial, sans-serif; margin: 20px; }
+form { margin-bottom: 20px; }
 input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
 button { padding: 5px 10px; }
 #status { margin-top: 10px; color: green; }
+#status.error { color: red; }
+#postForm { display: none; margin-top: 20px; }
 </style>
 </head>
 <body>
 
 <h2>Admin Login</h2>
+
 <form id="loginForm">
   <input type="text" name="username" placeholder="Username" required />
   <input type="password" name="password" placeholder="Password" required />
   <button type="submit">Login</button>
 </form>
 
-<script>
-let token = "";
+<div id="status"></div>
 
-// ===== Login Form =====
+<div id="postForm">
+  <h2>Posts Section</h2>
+  <!-- Add your post form here -->
+  <p>Welcome! You are logged in. Now you can manage posts.</p>
+</div>
+
+<script>
+const API_URL = "https://cms.zedtopvibes.workers.dev/login";
+
 document.getElementById("loginForm").addEventListener("submit", async e => {
   e.preventDefault();
   const form = e.target;
+  const statusEl = document.getElementById("status");
+
   const data = {
     username: form.username.value,
     password: form.password.value
   };
 
-  const res = await fetch("https://cms.zedtopvibes.workers.dev/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  statusEl.innerText = "Logging in...";
+  statusEl.classList.remove("error");
 
-  const result = await res.json();
-  if (result.success) {
-    token = result.token;
-    document.getElementById("status").innerText = "Login successful!";
-    form.style.display = "none";
-    document.getElementById("postForm").style.display = "block";
-  } else {
-    document.getElementById("status").innerText = "Login failed: " + result.message;
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      // Store session token
+      localStorage.setItem("sessionToken", result.token);
+
+      statusEl.innerText = "Login successful!";
+      form.style.display = "none";
+      document.getElementById("postForm").style.display = "block";
+    } else {
+      statusEl.innerText = "Login failed: " + result.message;
+      statusEl.classList.add("error");
+    }
+  } catch(err) {
+    statusEl.innerText = "Login error: " + err.message;
+    statusEl.classList.add("error");
   }
 });
-
 </script>
 
 </body>
