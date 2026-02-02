@@ -89,8 +89,6 @@ button:hover { background: #45a049; }
   <div id="status"></div>
 
   <div id="postForm">
-    <h2>Posts Section</h2>
-    <p>Welcome! You are logged in.</p>
     <button id="logoutBtn">Logout</button>
   </div>
 </div>
@@ -103,8 +101,9 @@ let token = localStorage.getItem("sessionToken") || "";
 if(token) {
   document.getElementById("loginForm").style.display = "none";
   document.getElementById("postForm").style.display = "block";
-  document.getElementById("status").innerText = "You are already logged in.";
-  document.getElementById("status").classList.add("success");
+  const statusEl = document.getElementById("status");
+  statusEl.innerText = "You are already logged in.";
+  statusEl.classList.add("success");
 }
 
 // ===== Login Button Click =====
