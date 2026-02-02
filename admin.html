@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMS Admin Dashboard</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 20px; }
+body { font-family: Arial; margin: 20px; }
 form { margin-bottom: 20px; }
 input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
 button { padding: 5px 10px; }
@@ -21,23 +21,25 @@ button { padding: 5px 10px; }
 <form id="loginForm">
   <input type="text" name="username" placeholder="Username" required />
   <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Login</button>
+  <!-- Changed type to button -->
+  <button type="button" id="loginBtn">Login</button>
 </form>
 
 <div id="status"></div>
 
 <div id="postForm">
   <h2>Posts Section</h2>
-  <!-- Add your post form here -->
-  <p>Welcome! You are logged in. Now you can manage posts.</p>
+  <p>Welcome! You are logged in.</p>
+  <button id="logoutBtn">Logout</button>
 </div>
 
 <script>
 const API_URL = "https://cms.zedtopvibes.workers.dev/login";
+let token = "";
 
-document.getElementById("loginForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const form = e.target;
+// ===== Login Button Click =====
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const form = document.getElementById("loginForm");
   const statusEl = document.getElementById("status");
 
   const data = {
@@ -58,8 +60,8 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
     const result = await res.json();
 
     if (result.success) {
-      // Store session token
-      localStorage.setItem("sessionToken", result.token);
+      token = result.token;
+      localStorage.setItem("sessionToken", token);
 
       statusEl.innerText = "Login successful!";
       form.style.display = "none";
@@ -72,6 +74,16 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
     statusEl.innerText = "Login error: " + err.message;
     statusEl.classList.add("error");
   }
+});
+
+// ===== Logout Button =====
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  token = "";
+  localStorage.removeItem("sessionToken");
+  document.getElementById("postForm").style.display = "none";
+  document.getElementById("loginForm").style.display = "block";
+  document.getElementById("status").innerText = "Logged out successfully.";
+  document.getElementById("status").classList.remove("error");
 });
 </script>
 
