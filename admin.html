@@ -5,106 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMS Admin Dashboard</title>
 <style>
-/* ===== Reset & Basic Styles ===== */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-body {
-  background: #f4f4f9;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-.container {
-  background: #fff;
-  padding: 30px 40px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 400px;
-}
-h2 { text-align: center; margin-bottom: 20px; color: #333; }
-
-/* ===== Form Styles ===== */
-form {
-  display: flex;
-  flex-direction: column;
-}
-input {
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-button {
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  background: #4caf50;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-button:hover { background: #45a049; }
-
-/* ===== Status Messages ===== */
-#status {
-  margin-top: 15px;
-  text-align: center;
-  font-weight: 500;
-}
-#status.error { color: #e74c3c; }
-#status.success { color: #2ecc71; }
-
-/* ===== Post Section ===== */
-#postForm {
-  display: none;
-  text-align: center;
-  margin-top: 20px;
-}
-#postForm button {
-  background: #e74c3c;
-}
-#postForm button:hover { background: #c0392b; }
-
-/* ===== Responsive ===== */
-@media (max-width: 450px) {
-  .container { padding: 20px; }
-  input, button { width: 100%; }
-}
+body { font-family: Arial; margin: 20px; }
+form { margin-bottom: 20px; }
+input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
+button { padding: 5px 10px; }
+#status { margin-top: 10px; color: green; }
+#status.error { color: red; }
+#postForm { display: none; margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h2>Admin Login</h2>
+<h2>Admin Login</h2>
 
-  <form id="loginForm">
-    <input type="text" name="username" placeholder="Username" required />
-    <input type="password" name="password" placeholder="Password" required />
-    <button type="button" id="loginBtn">Login</button>
-  </form>
+<form id="loginForm">
+  <input type="text" name="username" placeholder="Username" required />
+  <input type="password" name="password" placeholder="Password" required />
+  <!-- Changed type to button -->
+  <button type="button" id="loginBtn">Login</button>
+</form>
 
-  <div id="status"></div>
+<div id="status"></div>
 
-  <div id="postForm">
-    <button id="logoutBtn">Logout</button>
-  </div>
+<div id="postForm">
+  <h2>Posts Section</h2>
+  <p>Welcome! You are logged in.</p>
+  <button id="logoutBtn">Logout</button>
 </div>
 
 <script>
 const API_URL = "https://cms.zedtopvibes.workers.dev/login";
-let token = localStorage.getItem("sessionToken") || "";
-
-// ===== Check existing session =====
-if(token) {
-  document.getElementById("loginForm").style.display = "none";
-  document.getElementById("postForm").style.display = "block";
-  const statusEl = document.getElementById("status");
-  statusEl.innerText = "You are already logged in.";
-  statusEl.classList.add("success");
-}
+let token = "";
 
 // ===== Login Button Click =====
 document.getElementById("loginBtn").addEventListener("click", async () => {
@@ -112,12 +43,12 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   const statusEl = document.getElementById("status");
 
   const data = {
-    username: form.username.value.trim(),
-    password: form.password.value.trim()
+    username: form.username.value,
+    password: form.password.value
   };
 
   statusEl.innerText = "Logging in...";
-  statusEl.classList.remove("error", "success");
+  statusEl.classList.remove("error");
 
   try {
     const res = await fetch(API_URL, {
@@ -128,16 +59,15 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
     const result = await res.json();
 
-    if(result.success) {
+    if (result.success) {
       token = result.token;
       localStorage.setItem("sessionToken", token);
 
       statusEl.innerText = "Login successful!";
-      statusEl.classList.add("success");
       form.style.display = "none";
       document.getElementById("postForm").style.display = "block";
     } else {
-      statusEl.innerText = "Login failed: " + (result.message || "Invalid credentials");
+      statusEl.innerText = "Login failed: " + result.message;
       statusEl.classList.add("error");
     }
   } catch(err) {
@@ -152,10 +82,8 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("sessionToken");
   document.getElementById("postForm").style.display = "none";
   document.getElementById("loginForm").style.display = "block";
-  const statusEl = document.getElementById("status");
-  statusEl.innerText = "Logged out successfully.";
-  statusEl.classList.remove("error");
-  statusEl.classList.add("success");
+  document.getElementById("status").innerText = "Logged out successfully.";
+  document.getElementById("status").classList.remove("error");
 });
 </script>
 
