@@ -95,7 +95,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
       body: JSON.stringify({ username: form.username.value, password: form.password.value })
     });
     const data = await res.json();
-    if(data.success){
+    if (data.success) {
       token = data.token;
       localStorage.setItem("sessionToken", token);
       setStatus("Login successful!");
@@ -103,11 +103,13 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
       document.getElementById("adminDashboard").style.display = "block";
       loadAllData();
     } else setStatus("Login failed: " + data.message, true);
-  } catch(e){ setStatus("Login error: " + e.message,true); }
+  } catch(err) {
+    setStatus("Login error: " + err.message, true);
+  }
 });
 
 // ===== LOGOUT =====
-document.getElementById("logoutBtn").addEventListener("click", ()=>{
+document.getElementById("logoutBtn").addEventListener("click", () => {
   token = "";
   localStorage.removeItem("sessionToken");
   document.getElementById("adminDashboard").style.display = "none";
@@ -118,27 +120,27 @@ document.getElementById("logoutBtn").addEventListener("click", ()=>{
 // ===== HELPER FETCH =====
 const authFetch = (url, options={})=>{
   options.headers = options.headers || {};
-  options.headers["Cookie"] = `zed_session=${token}`;
+  options.headers["Authorization"] = `Bearer ${token}`;
   return fetch(url, options);
 };
 
 // ===== ARTISTS =====
 const artistsListEl = document.getElementById("artistsList");
 const artistForm = document.getElementById("artistForm");
-document.getElementById("addArtistBtn").addEventListener("click", async ()=>{
+document.getElementById("addArtistBtn").addEventListener("click", async () => {
   const data = { name: artistForm.name.value, bio: artistForm.bio.value };
-  try{
+  try {
     const res = await authFetch(`${WORKER_URL}/artists`, { method:"POST", body:JSON.stringify(data), headers:{"Content-Type":"application/json"} });
     const artist = await res.json();
-    if(res.ok){ artistForm.reset(); loadArtists(); } else setStatus(artist.error,true);
+    if(res.ok){ artistForm.reset(); loadArtists(); }
+    else setStatus(artist.error, true);
   } catch(e){ setStatus(e.message,true); }
 });
 
-const loadArtists = async ()=>{
-  try{
+const loadArtists = async () => {
+  try {
     const res = await authFetch(`${WORKER_URL}/artists`);
     const data = await res.json();
-    if(!Array.isArray(data)) return setStatus("Invalid artist data",true);
     artistsListEl.innerHTML = "";
     const artistSelects = document.querySelectorAll("#albumForm select[name='artist_id'], #songForm select[name='artist_id']");
     artistSelects.forEach(s => s.innerHTML = "<option value=''>Select Artist</option>");
@@ -148,7 +150,6 @@ const loadArtists = async ()=>{
       div.innerHTML = `${a.name} <button onclick="deleteArtist('${a.id}')">Delete</button>`;
       artistsListEl.appendChild(div);
 
-      // populate selects
       artistSelects.forEach(s=>{
         const opt = document.createElement("option");
         opt.value = a.id;
@@ -161,29 +162,35 @@ const loadArtists = async ()=>{
 
 window.deleteArtist = async (id)=>{
   if(!confirm("Delete artist?")) return;
-  try{
+  try {
     const res = await authFetch(`${WORKER_URL}/artists/${id}`, { method:"DELETE" });
-    if(res.ok) loadArtists(); else { const err = await res.json(); setStatus(err.error,true); }
+    if(res.ok) loadArtists();
+    else { const err = await res.json(); setStatus(err.error,true); }
   } catch(e){ setStatus(e.message,true); }
 };
 
 // ===== ALBUMS =====
 const albumsListEl = document.getElementById("albumsList");
 const albumForm = document.getElementById("albumForm");
-document.getElementById("addAlbumBtn").addEventListener("click", async ()=>{
-  const data = { name: albumForm.name.value, artist_id: albumForm.artist_id.value, description: albumForm.description.value, release_date: albumForm.release_date.value };
-  try{
+document.getElementById("addAlbumBtn").addEventListener("click", async () => {
+  const data = {
+    name: albumForm.name.value,
+    artist_id: albumForm.artist_id.value,
+    description: albumForm.description.value,
+    release_date: albumForm.release_date.value
+  };
+  try {
     const res = await authFetch(`${WORKER_URL}/albums`, { method:"POST", body:JSON.stringify(data), headers:{"Content-Type":"application/json"} });
     const album = await res.json();
-    if(res.ok){ albumForm.reset(); loadAlbums(); } else setStatus(album.error,true);
+    if(res.ok){ albumForm.reset(); loadAlbums(); }
+    else setStatus(album.error, true);
   } catch(e){ setStatus(e.message,true); }
 });
 
-const loadAlbums = async ()=>{
-  try{
+const loadAlbums = async () => {
+  try {
     const res = await authFetch(`${WORKER_URL}/albums`);
     const data = await res.json();
-    if(!Array.isArray(data)) return setStatus("Invalid album data",true);
     albumsListEl.innerHTML = "";
     const albumSelect = document.querySelector("#songForm select[name='album_id']");
     albumSelect.innerHTML = "<option value=''>Select Album</option>";
@@ -203,16 +210,17 @@ const loadAlbums = async ()=>{
 
 window.deleteAlbum = async (id)=>{
   if(!confirm("Delete album?")) return;
-  try{
+  try {
     const res = await authFetch(`${WORKER_URL}/albums/${id}`, { method:"DELETE" });
-    if(res.ok) loadAlbums(); else { const err = await res.json(); setStatus(err.error,true); }
+    if(res.ok) loadAlbums();
+    else { const err = await res.json(); setStatus(err.error,true); }
   } catch(e){ setStatus(e.message,true); }
 };
 
 // ===== SONGS =====
 const songsListEl = document.getElementById("songsList");
 const songForm = document.getElementById("songForm");
-document.getElementById("addSongBtn").addEventListener("click", async ()=>{
+document.getElementById("addSongBtn").addEventListener("click", async () => {
   const data = {
     name: songForm.name.value,
     artist_id: songForm.artist_id.value,
@@ -220,18 +228,18 @@ document.getElementById("addSongBtn").addEventListener("click", async ()=>{
     duration: Number(songForm.duration.value),
     file_url: songForm.file_url.value
   };
-  try{
+  try {
     const res = await authFetch(`${WORKER_URL}/songs`, { method:"POST", body:JSON.stringify(data), headers:{"Content-Type":"application/json"} });
     const song = await res.json();
-    if(res.ok){ songForm.reset(); loadSongs(); } else setStatus(song.error,true);
+    if(res.ok){ songForm.reset(); loadSongs(); }
+    else setStatus(song.error, true);
   } catch(e){ setStatus(e.message,true); }
 });
 
-const loadSongs = async ()=>{
-  try{
+const loadSongs = async () => {
+  try {
     const res = await authFetch(`${WORKER_URL}/songs`);
     const data = await res.json();
-    if(!Array.isArray(data)) return setStatus("Invalid song data",true);
     songsListEl.innerHTML = "";
     data.forEach(s=>{
       const div = document.createElement("div");
@@ -244,9 +252,10 @@ const loadSongs = async ()=>{
 
 window.deleteSong = async (id)=>{
   if(!confirm("Delete song?")) return;
-  try{
+  try {
     const res = await authFetch(`${WORKER_URL}/songs/${id}`, { method:"DELETE" });
-    if(res.ok) loadSongs(); else { const err = await res.json(); setStatus(err.error,true); }
+    if(res.ok) loadSongs();
+    else { const err = await res.json(); setStatus(err.error,true); }
   } catch(e){ setStatus(e.message,true); }
 };
 
@@ -257,7 +266,7 @@ const loadAllData = ()=>{
   loadSongs();
 };
 
-// Auto load if session exists
+// Auto-login if token exists
 if(token){
   document.getElementById("loginForm").style.display = "none";
   document.getElementById("adminDashboard").style.display = "block";
