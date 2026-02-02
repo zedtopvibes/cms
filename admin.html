@@ -8,7 +8,7 @@
 body { font-family: Arial; margin: 20px; }
 form { margin-bottom: 20px; }
 input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
-button { padding: 5px 10px; }
+button { padding: 5px 10px; cursor: pointer; }
 #status { margin-top: 10px; color: green; }
 #status.error { color: red; }
 #postForm { display: none; margin-top: 20px; }
@@ -21,7 +21,6 @@ button { padding: 5px 10px; }
 <form id="loginForm">
   <input type="text" name="username" placeholder="Username" required />
   <input type="password" name="password" placeholder="Password" required />
-  <!-- Changed type to button -->
   <button type="button" id="loginBtn">Login</button>
 </form>
 
@@ -35,12 +34,22 @@ button { padding: 5px 10px; }
 
 <script>
 const API_URL = "https://cms.zedtopvibes.workers.dev/login";
-let token = "";
+let token = localStorage.getItem("sessionToken") || "";
+
+// ===== Auto-login if token exists =====
+window.addEventListener("DOMContentLoaded", () => {
+  if(token){
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("postForm").style.display = "block";
+    document.getElementById("status").innerText = "Session restored.";
+  }
+});
 
 // ===== Login Button Click =====
 document.getElementById("loginBtn").addEventListener("click", async () => {
   const form = document.getElementById("loginForm");
   const statusEl = document.getElementById("status");
+  const loginBtn = document.getElementById("loginBtn");
 
   const data = {
     username: form.username.value,
@@ -49,6 +58,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
   statusEl.innerText = "Logging in...";
   statusEl.classList.remove("error");
+  loginBtn.disabled = true;
 
   try {
     const res = await fetch(API_URL, {
@@ -73,6 +83,8 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   } catch(err) {
     statusEl.innerText = "Login error: " + err.message;
     statusEl.classList.add("error");
+  } finally {
+    loginBtn.disabled = false;
   }
 });
 
@@ -82,8 +94,9 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("sessionToken");
   document.getElementById("postForm").style.display = "none";
   document.getElementById("loginForm").style.display = "block";
-  document.getElementById("status").innerText = "Logged out successfully.";
-  document.getElementById("status").classList.remove("error");
+  const statusEl = document.getElementById("status");
+  statusEl.innerText = "Logged out successfully.";
+  statusEl.classList.remove("error");
 });
 </script>
 
