@@ -1,230 +1,513 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
-  <title>CMS Dashboard</title>    
-  <style>  
-    * { box-sizing: border-box; max-width: 100%; }  
-    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f6f7f7; color: #1d2327; overflow-x: hidden; }  
-    a { text-decoration: none; color: inherit; }  
-    button { background: none; border: none; cursor: pointer; font-size: 1rem; }  
-  
-    .topbar { height: 48px; background: #fff; border-bottom:1px solid #dcdcde; display:flex; align-items:center; justify-content:space-between; padding:0 1rem; position:fixed; top:0; left:0; right:0; z-index:1000; }  
-    .topbar .left { display:flex; align-items:center; gap:0.75rem; }  
-    .topbar .title { font-weight:600; font-size:0.95rem; }  
-    .menu-toggle { display:none; }  
-  
-    .sidebar { width:220px; background:#1d2327; color:#fff; position:fixed; top:48px; bottom:0; left:0; padding:1rem 0; overflow-y:auto; }  
-    .sidebar nav a { display:block; padding:0.6rem 1.2rem; font-size:0.9rem; color:#c3c4c7; }  
-    .sidebar nav a.active, .sidebar nav a:hover { background:#2271b1; color:#fff; }  
-    .sidebar .dropdown a { padding-left:1.5rem; font-size:0.85rem; }  
-  
-    .main { margin-left:220px; padding:1.5rem; padding-top:72px; min-height:100vh; }  
-    .page-title { font-size:1.4rem; font-weight:600; margin-bottom:1rem; }  
-    .content-panel { background:#fff; border:1px solid #dcdcde; padding:1.5rem; min-height:300px; }  
-  
-    @media (max-width:768px){  
-      .menu-toggle { display:inline-block; font-size:1.2rem; }  
-      .sidebar { transform:translateX(-100%); transition:transform 0.25s ease; z-index:999; }  
-      .sidebar.open { transform:translateX(0); }  
-      .main { margin-left:0; padding:1rem; padding-top:64px; }  
-    }  
-  
-    input[type="text"], textarea, select, input[type="file"], input[type="date"] { width:100%; max-width:300px; padding:6px; margin-top:4px; margin-bottom:10px; }  
-    button { cursor:pointer; }  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS Dashboard</title>
+  <style>
+    /* ===============================
+       LOGIN PAGE STYLES
+       =============================== */
+    .login-container {
+      display: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #333;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2000;
+    }
+
+    .login-box {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h1 {
+      font-size: 28px;
+      color: #4f46e5;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .logo p {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.2s;
+      background: #f9fafb;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: #4f46e5;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+    }
+
+    .password-toggle:hover {
+      color: #4f46e5;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .login-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .success-message {
+      background: #d1fae5;
+      border: 1px solid #a7f3d0;
+      color: #059669;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status-indicator {
+      font-size: 12px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 20px;
+      padding: 8px;
+      border-radius: 6px;
+      background: #f3f4f6;
+      display: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .visible {
+      display: block !important;
+    }
+
+    .shake {
+      animation: shake 0.5s;
+    }
+
+    /* ===============================
+       DASHBOARD STYLES
+       =============================== */
+    * { box-sizing: border-box; max-width: 100%; }
+    
+    .dashboard-body {
+      margin: 0; 
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+      background: #f6f7f7; 
+      color: #1d2327; 
+      overflow-x: hidden;
+      display: none;
+    }
+    
+    a { text-decoration: none; color: inherit; }
+    button { background: none; border: none; cursor: pointer; font-size: 1rem; }
+
+    .topbar { 
+      height: 48px; 
+      background: #fff; 
+      border-bottom:1px solid #dcdcde; 
+      display:flex; 
+      align-items:center; 
+      justify-content:space-between; 
+      padding:0 1rem; 
+      position:fixed; 
+      top:0; 
+      left:0; 
+      right:0; 
+      z-index:1000; 
+    }
+    
+    .topbar .left { display:flex; align-items:center; gap:0.75rem; }
+    .topbar .title { font-weight:600; font-size:0.95rem; }
+    .menu-toggle { display:none; }
+
+    .sidebar { 
+      width:220px; 
+      background:#1d2327; 
+      color:#fff; 
+      position:fixed; 
+      top:48px; 
+      bottom:0; 
+      left:0; 
+      padding:1rem 0; 
+      overflow-y:auto; 
+    }
+    
+    .sidebar nav a { display:block; padding:0.6rem 1.2rem; font-size:0.9rem; color:#c3c4c7; }
+    .sidebar nav a.active, .sidebar nav a:hover { background:#2271b1; color:#fff; }
+    .sidebar .dropdown a { padding-left:1.5rem; font-size:0.85rem; }
+
+    .main { 
+      margin-left:220px; 
+      padding:1.5rem; 
+      padding-top:72px; 
+      min-height:100vh; 
+    }
+    
+    .page-title { font-size:1.4rem; font-weight:600; margin-bottom:1rem; }
+    .content-panel { background:#fff; border:1px solid #dcdcde; padding:1.5rem; min-height:300px; }
+
+    @media (max-width:768px){
+      .menu-toggle { display:inline-block; font-size:1.2rem; }
+      .sidebar { transform:translateX(-100%); transition:transform 0.25s ease; z-index:999; }
+      .sidebar.open { transform:translateX(0); }
+      .main { margin-left:0; padding:1rem; padding-top:64px; }
+    }
+
+    input[type="text"], textarea, select, input[type="file"], input[type="date"] { 
+      width:100%; 
+      max-width:300px; 
+      padding:6px; 
+      margin-top:4px; 
+      margin-bottom:10px; 
+    }
     
     /* ===============================
-   10️⃣ THEME / APPEARANCE SWITCHER
-   =============================== */
-body.dark-mode {
-  background: #121212;
-  color: #f0f0f0;
-}
+       DARK MODE
+       =============================== */
+    .dashboard-body.dark-mode {
+      background: #121212;
+      color: #f0f0f0;
+    }
 
-body.dark-mode .topbar {
-  background: #1e1e1e;
-  border-bottom: 1px solid #333;
-}
+    .dashboard-body.dark-mode .topbar {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+    }
 
-body.dark-mode .sidebar {
-  background: #1b1b1b;
-  color: #ddd;
-}
+    .dashboard-body.dark-mode .sidebar {
+      background: #1b1b1b;
+      color: #ddd;
+    }
 
-body.dark-mode .sidebar nav a {
-  color: #ccc;
-}
+    .dashboard-body.dark-mode .sidebar nav a {
+      color: #ccc;
+    }
 
-body.dark-mode .sidebar nav a.active,
-body.dark-mode .sidebar nav a:hover {
-  background: #337ab7;
-  color: #fff;
-}
+    .dashboard-body.dark-mode .sidebar nav a.active,
+    .dashboard-body.dark-mode .sidebar nav a:hover {
+      background: #337ab7;
+      color: #fff;
+    }
 
-body.dark-mode .main .content-panel {
-  background: #1e1e1e;
-  border: 1px solid #333;
-}
+    .dashboard-body.dark-mode .main .content-panel {
+      background: #1e1e1e;
+      border: 1px solid #333;
+    }
 
-body.dark-mode button {
-  background: #2a2a2a;
-  color: #fff;
-}
+    .dashboard-body.dark-mode button {
+      background: #2a2a2a;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- ===============================
+       LOGIN CONTAINER
+       =============================== -->
+  <div id="loginContainer" class="login-container">
+    <div class="login-box">
+      <div id="loginForm">
+        <div class="logo">
+          <h1>CMS Admin</h1>
+          <p>Sign in to your dashboard</p>
+        </div>
 
-/* File Manager Styles */
-.file-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
-}
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
 
-.file-card {
-  border: 1px solid #dcdcde;
-  border-radius: 8px;
-  padding: 15px;
-  background: #fff;
-}
+        <form id="loginFormElement">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="username" 
+                class="login-input"
+                name="username" 
+                required 
+                autocomplete="username"
+                placeholder="Enter your username"
+              >
+            </div>
+          </div>
 
-.file-card img {
-  max-width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 4px;
-}
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <input 
+                type="password" 
+                id="password" 
+                class="login-input"
+                name="password" 
+                required 
+                autocomplete="current-password"
+                placeholder="Enter your password"
+              >
+              <button type="button" class="password-toggle" id="togglePassword">
+                👁
+              </button>
+            </div>
+          </div>
 
-.file-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+          <button type="submit" class="login-btn" id="submitBtn">
+            <span id="btnText">Sign In</span>
+            <div class="loading hidden" id="loadingIndicator"></div>
+          </button>
+        </form>
 
-.file-action-btn {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  background: #2271b1;
-  color: white;
-  border: none;
-}
+        <div class="status-indicator" id="statusIndicator">
+          Checking session...
+        </div>
+      </div>
+    </div>
+  </div>
 
-.file-action-btn.delete {
-  background: #dc3232;
-}
+  <!-- ===============================
+       DASHBOARD CONTAINER
+       =============================== -->
+  <div id="dashboardContainer" class="dashboard-body">
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="left">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="title">CMS Dashboard</div>
+      </div>
+      <div class="right">
+        <button id="themeToggleBtn">🌙</button>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </header>
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <nav>
+        <a href="#" class="active" onclick="setPage('Home', this)">Home</a>
+        <!-- Posts -->
+        <a href="#" onclick="toggleDropdown('postsDropdown')">Posts ▾</a>
+        <div id="postsDropdown" class="dropdown" style="display:none;">
+          <a href="#" onclick="setPage('Posts', this)">All Posts</a>
+          <a href="#" onclick="setPage('CreatePost', this)">Create Post</a>
+        </div>
 
-.file-stats {
-  background: #f0f0f1;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
+        <a href="#" onclick="setPage('File Manager', this)">File Manager</a>
+        <a href="#" onclick="setPage('Analytics', this)">Analytics</a>
+        <a href="#" onclick="setPage('Settings', this)">Settings</a>
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-}
+        <!-- Albums -->
+        <a href="#" onclick="toggleDropdown('albumsDropdown')">Albums ▾</a>
+        <div id="albumsDropdown" class="dropdown" style="display:none;">
+          <a href="#" onclick="setPage('Albums', this)">All Albums</a>
+          <a href="#" onclick="setPage('CreateAlbum', this)">Create Album</a>
+        </div>
 
-.stat-box {
-  background: white;
-  padding: 15px;
-  border-radius: 6px;
-  text-align: center;
-  border: 1px solid #dcdcde;
-}
+        <!-- Artists -->
+        <a href="#" onclick="toggleDropdown('artistsDropdown')">Artists ▾</a>
+        <div id="artistsDropdown" class="dropdown" style="display:none;">
+          <a href="#" onclick="setPage('Artists', this)">All Artists</a>
+          <a href="#" onclick="openCreateArtist(this)">Create Artist</a>
+        </div>
+      </nav>
+    </aside>
 
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2271b1;
-}
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <h1 class="page-title" id="pageTitle">Home</h1>
+      <div class="content-panel">
+        <!-- HOME -->
+        <div id="panel-Home">
+          <p>Welcome to the CMS! This is the Home page.</p>
+        </div>
 
-.stat-label {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 5px;
-}
+        <!-- POSTS -->
+        <div id="panel-Posts" style="display:none;">
+          <h2>All Posts</h2>
+          <!-- 🔍 Post Search -->
+          <input
+            type="text"
+            id="postSearchInput"
+            placeholder="Search by title, artist, album, tag..."
+            style="margin-bottom:10px; max-width:300px;"
+            oninput="filterPosts()"
+          />
+          <!-- Filters -->
+          <div id="postFilters" style="margin-bottom:10px;">
+            <select id="filterGenre">
+              <option value="">-- All Genres --</option>
+              <option>Afropop</option>
+              <option>Hip Hop</option>
+              <option>R&B</option>
+              <option>Gospel</option>
+              <option>Reggae</option>
+            </select>
 
-/* Audio player */
-.audio-player {
-  margin: 10px 0;
-}
+            <select id="filterFeatured">
+              <option value="">-- All Posts --</option>
+              <option value="true">Featured</option>
+              <option value="false">Not Featured</option>
+            </select>
 
-.audio-player audio {
-  width: 100%;
-  max-width: 300px;
-}
-  </style>  
-</head>  
-<body>    
-  <!-- TOP BAR -->    
-  <header class="topbar">  
-    <div class="left">  
-      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>  
-      <div class="title">CMS Dashboard</div>  
-    </div>  
-    <div class="right">  
-    	<button id="themeToggleBtn">🌙</button>
-      <button onclick="alert('Logout logic goes here')">Logout</button>  
-    </div>  
-  </header>    
-  <!-- SIDEBAR -->    
-  <aside class="sidebar" id="sidebar">  
-    <nav>  
-      <a href="#" class="active" onclick="setPage('Home', this)">Home</a>  
-      <!-- Posts -->  
-      <a href="#" onclick="toggleDropdown('postsDropdown')">Posts ▾</a>  
-      <div id="postsDropdown" class="dropdown" style="display:none;">  
-        <a href="#" onclick="setPage('Posts', this)">All Posts</a>  
-        <a href="#" onclick="setPage('CreatePost', this)">Create Post</a>  
-      </div>  
+            <select id="filterStatus">
+              <option value="">-- All Status --</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
 
-      <a href="#" onclick="setPage('File Manager', this)">File Manager</a>  
-      <a href="#" onclick="setPage('Analytics', this)">Analytics</a>  
-      <a href="#" onclick="setPage('Settings', this)">Settings</a>  
+            <input type="date" id="filterDateFrom" placeholder="From Date">
+            <input type="date" id="filterDateTo" placeholder="To Date">
+          </div>
 
-      <!-- Albums -->  
-      <a href="#" onclick="toggleDropdown('albumsDropdown')">Albums ▾</a>  
-      <div id="albumsDropdown" class="dropdown" style="display:none;">  
-        <a href="#" onclick="setPage('Albums', this)">All Albums</a>  
-        <a href="#" onclick="setPage('CreateAlbum', this)">Create Album</a>  
-      </div>  
+          <div id="postsListContainer"></div>
+        </div>
 
-      <!-- Artists -->  
-      <a href="#" onclick="toggleDropdown('artistsDropdown')">Artists ▾</a>  
-      <div id="artistsDropdown" class="dropdown" style="display:none;">  
-        <a href="#" onclick="setPage('Artists', this)">All Artists</a>  
-        <a href="#" onclick="openCreateArtist(this)">Create Artist</a>  
-      </div>  
-    </nav>
-  </aside>    
+        <div id="panel-CreatePost" style="display:none;">
+          <h2>Create Post</h2>
 
-  <!-- MAIN CONTENT -->    
-  <main class="main">  
-    <h1 class="page-title" id="pageTitle">Home</h1>  
-    <div class="content-panel">  
-      <!-- HOME -->  
-      <div id="panel-Home">  
-        <p>Welcome to the CMS! This is the Home page.</p>  
-      </div>  
+          <!-- NEW: Post Type Selection -->
+          <p>Post Type:</p>
+          <select id="postTypeSelect" onchange="toggleAlbumSelect()">
+            <option value="single">Single</option>
+            <option value="album">Album</option>
+          </select>
 
-      <!-- POSTS -->  
-      <div id="panel-Posts" style="display:none;">  
-        <h2>All Posts</h2>  
-        <!-- 🔍 Post Search -->
-        <input
-          type="text"
-          id="postSearchInput"
-          placeholder="Search by title, artist, album, tag..."
-          style="margin-bottom:10px; max-width:300px;"
-          oninput="filterPosts()"
-        />
-        <!-- Filters -->
-        <div id="postFilters" style="margin-bottom:10px;">
-          <select id="filterGenre">
-            <option value="">-- All Genres --</option>
+          <p>Upload Thumbnail:</p>
+          <input type="file" accept="image/*" id="thumbnailInputPosts">
+          <div id="thumbnailPreviewPosts"></div>
+
+          <p>Upload Audio:</p>
+          <input type="file" accept="audio/*" id="audioInputPosts">
+          <div id="audioPreviewPosts" style="font-size:0.9rem; color:#555;"></div>
+
+          <p>Post Title:</p>
+          <input type="text" id="postNameInput" placeholder="Enter post name">
+
+          <p>Post Description:</p>
+          <textarea id="postDescriptionInput" placeholder="Enter description / lyrics"></textarea>
+
+          <!-- Album Select (Conditional) -->
+          <div id="albumSelectContainer">
+            <p>Link to Album:</p>
+            <select id="postAlbumSelect"><option value="">-- Select Album --</option></select>
+          </div>
+
+          <p>Link to Artist:</p>
+          <select id="postArtistSelect"><option value="">-- Select Artist --</option></select>
+
+          <p>Genre:</p>
+          <select id="postGenreSelect">
+            <option value="">-- Select Genre --</option>
             <option>Afropop</option>
             <option>Hip Hop</option>
             <option>R&B</option>
@@ -232,219 +515,364 @@ body.dark-mode button {
             <option>Reggae</option>
           </select>
 
-          <select id="filterFeatured">
-            <option value="">-- All Posts --</option>
-            <option value="true">Featured</option>
-            <option value="false">Not Featured</option>
-          </select>
+          <p>Release Date:</p>
+          <input type="date" id="postReleaseDate">
 
-          <select id="filterStatus">
-            <option value="">-- All Status --</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-          </select>
+          <p>Tags (comma separated):</p>
+          <input type="text" id="postTagsInput" placeholder="e.g. love, dance, hit">
 
-          <input type="date" id="filterDateFrom" placeholder="From Date">
-          <input type="date" id="filterDateTo" placeholder="To Date">
+          <p>Featured Post:</p>
+          <input type="checkbox" id="postFeaturedInput"> Yes
+
+          <p>Optional YouTube / External Link:</p>
+          <input type="text" id="postExternalLink" placeholder="https://">
+
+          <!-- Draft or Publish -->
+          <label style="display:block; margin-bottom:8px;">
+            <input type="checkbox" id="postPublishToggle">
+            Publish immediately
+          </label>
+
+          <button onclick="createPost()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">
+            Save Post
+          </button>
+          <button 
+            onclick="publishDraft()" 
+            style="padding:6px 12px; background:#28a745; color:#fff; border-radius:4px; margin-left:5px;">
+            Publish Draft
+          </button>
         </div>
 
-        <div id="postsListContainer"></div>  
-      </div>  
-
-      <div id="panel-CreatePost" style="display:none;">  
-        <h2>Create Post</h2>  
-
-        <!-- NEW: Post Type Selection -->
-        <p>Post Type:</p>
-        <select id="postTypeSelect" onchange="toggleAlbumSelect()">
-          <option value="single">Single</option>
-          <option value="album">Album</option>
-        </select>
-
-        <p>Upload Thumbnail:</p>  
-        <input type="file" accept="image/*" id="thumbnailInputPosts">  
-        <div id="thumbnailPreviewPosts"></div>  
-
-        <p>Upload Audio:</p>  
-        <input type="file" accept="audio/*" id="audioInputPosts">  
-        <div id="audioPreviewPosts" style="font-size:0.9rem; color:#555;"></div>  
-
-        <p>Post Title:</p>  
-        <input type="text" id="postNameInput" placeholder="Enter post name">  
-
-        <p>Post Description:</p>  
-        <textarea id="postDescriptionInput" placeholder="Enter description / lyrics"></textarea>  
-
-        <!-- Album Select (Conditional) -->
-        <div id="albumSelectContainer">
-          <p>Link to Album:</p>  
-          <select id="postAlbumSelect"><option value="">-- Select Album --</option></select>  
+        <!-- FILE MANAGER -->
+        <div id="panel-File Manager" style="display:none;">
+          <p>File Manager placeholder.</p>
         </div>
 
-        <p>Link to Artist:</p>  
-        <select id="postArtistSelect"><option value="">-- Select Artist --</option></select>  
+        <!-- ANALYTICS -->
+        <div id="panel-Analytics" style="display:none;">
+          <p>Analytics placeholder.</p>
+        </div>
 
-        <p>Genre:</p>  
-        <select id="postGenreSelect">  
-          <option value="">-- Select Genre --</option>  
-          <option>Afropop</option>  
-          <option>Hip Hop</option>  
-          <option>R&B</option>  
-          <option>Gospel</option>  
-          <option>Reggae</option>  
-        </select>  
+        <!-- SETTINGS -->
+        <div id="panel-Settings" style="display:none;">
+          <p>Settings placeholder.</p>
+        </div>
 
-        <p>Release Date:</p>  
-        <input type="date" id="postReleaseDate">  
+        <!-- ALBUMS -->
+        <div id="panel-Albums" style="display:none;">
+          <h2>All Albums</h2>
+          <div id="albumsListContainer"></div>
+        </div>
 
-        <p>Tags (comma separated):</p>  
-        <input type="text" id="postTagsInput" placeholder="e.g. love, dance, hit">  
+        <div id="panel-CreateAlbum" style="display:none;">
+          <h2>Create Album</h2>
+          <p>Album Name:</p>
+          <input type="text" id="albumNameInput" placeholder="Enter album name">
+          <p>Album Description:</p>
+          <textarea id="albumDescriptionInput" placeholder="Enter album description"></textarea>
+          <p>Upload Thumbnail:</p>
+          <input type="file" accept="image/*" id="thumbnailInputAlbums">
+          <div id="thumbnailPreviewAlbums"></div>
+          <p>Link Posts to Album:</p>
+          <div id="albumLinkPostsContainer">
+            <em>No posts yet. Create posts first.</em>
+          </div>
+          <button onclick="createAlbum()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">Save Album</button>
+        </div>
 
-        <p>Featured Post:</p>  
-        <input type="checkbox" id="postFeaturedInput"> Yes  
+        <!-- ARTISTS -->
+        <div id="panel-Artists" style="display:none;">
+          <h2>All Artists</h2>
+          <div id="artistsListContainer"></div>
+        </div>
 
-        <p>Optional YouTube / External Link:</p>  
-        <input type="text" id="postExternalLink" placeholder="https://">  
+        <div id="panel-CreateArtist" style="display:none;">
+          <h2>Create Artist</h2>
+          <p>Artist Name:</p>
+          <input type="text" id="artistNameInput" placeholder="Enter artist name">
 
-        <!-- Draft or Publish -->
-        <label style="display:block; margin-bottom:8px;">
-          <input type="checkbox" id="postPublishToggle">
-          Publish immediately
-        </label>
+          <p>Upload Thumbnail:</p>
+          <input type="file" accept="image/*" id="thumbnailInputArtists">
+          <div id="thumbnailPreviewArtists"></div>
 
-        <button onclick="createPost()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">
-          Save Post
-        </button>
-        <button 
-          onclick="publishDraft()" 
-          style="padding:6px 12px; background:#28a745; color:#fff; border-radius:4px; margin-left:5px;">
-          Publish Draft
-        </button>
+          <p>Biography:</p>
+          <textarea id="artistBioInput" placeholder="Enter artist biography"></textarea>
+
+          <p>Social Links:</p>
+          <input type="text" id="artistInstagramInput" placeholder="Instagram URL">
+          <input type="text" id="artistTikTokInput" placeholder="TikTok URL">
+          <input type="text" id="artistYouTubeInput" placeholder="YouTube URL">
+          <input type="text" id="artistSpotifyInput" placeholder="Spotify URL">
+
+          <p>Featured Artist:</p>
+          <input type="checkbox" id="artistFeaturedInput"> Yes
+          <p>Link existing posts to this Artist:</p>
+          <div id="artistLinkPostsContainer">
+            <em>No posts yet. Create posts first.</em>
+          </div>
+          <button onclick="createArtist()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">Save Artist</button>
+        </div>
       </div>
-
-      <!-- FILE MANAGER -->  
-      <div id="panel-File Manager" style="display:none;">  
-        <h2>File Manager</h2>
-        
-        <!-- Upload Section -->
-        <div style="margin-bottom: 20px; padding: 15px; background: #f0f0f1; border-radius: 8px;">
-          <h3>Upload New File</h3>
-          <input type="file" id="fileUploadInput" multiple>
-          <button onclick="uploadFile()" style="padding: 6px 12px; background: #2271b1; color: #fff; border-radius: 4px; margin-top: 10px;">
-            Upload File(s)
-          </button>
-          <div id="uploadProgress" style="margin-top: 10px;"></div>
-        </div>
-        
-        <!-- File Statistics -->
-        <div id="fileStats" class="file-stats">
-          <h3>Storage Statistics</h3>
-          <div class="stats-grid" id="statsGrid"></div>
-        </div>
-        
-        <!-- File List -->
-        <h3>All Files</h3>
-        <div class="file-grid" id="fileGrid"></div>
-      </div>  
-
-      <!-- ANALYTICS -->  
-      <div id="panel-Analytics" style="display:none;">  
-        <p>Analytics placeholder.</p>  
-      </div>  
-
-      <!-- SETTINGS -->  
-      <div id="panel-Settings" style="display:none;">  
-        <h2>Backend Settings</h2>
-        <div style="background: #f0f0f1; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-          <h3>R2 Storage Configuration</h3>
-          <p><strong>Bucket Name:</strong> <span id="bucketName">media</span></p>
-          <p><strong>Allowed Extensions:</strong> <span id="allowedExtensions">.jpg, .png, .pdf, .zip, .mp4, .mp3</span></p>
-          <p><strong>Streaming Endpoint:</strong> <code>/stream/</code></p>
-          <p><strong>Download Endpoint:</strong> <code>/download/</code></p>
-        </div>
-        
-        <div style="margin-top: 20px;">
-          <h3>Test Backend Connection</h3>
-          <button onclick="testBackendConnection()" style="padding: 6px 12px; background: #2271b1; color: #fff; border-radius: 4px;">
-            Test Connection
-          </button>
-          <div id="connectionTestResult" style="margin-top: 10px;"></div>
-        </div>
-      </div>  
-
-      <!-- ALBUMS -->  
-      <div id="panel-Albums" style="display:none;">  
-        <h2>All Albums</h2>  
-        <div id="albumsListContainer"></div>  
-      </div>  
-
-      <div id="panel-CreateAlbum" style="display:none;">
-        <h2>Create Album</h2>    
-        <p>Album Name:</p>  
-        <input type="text" id="albumNameInput" placeholder="Enter album name">    
-        <p>Album Description:</p>  
-        <textarea id="albumDescriptionInput" placeholder="Enter album description"></textarea>    
-        <p>Upload Thumbnail:</p>  
-        <input type="file" accept="image/*" id="thumbnailInputAlbums">  
-        <div id="thumbnailPreviewAlbums"></div>    
-        <p>Link Posts to Album:</p>  
-        <div id="albumLinkPostsContainer">  
-          <em>No posts yet. Create posts first.</em>  
-        </div>  
-        <button onclick="createAlbum()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">Save Album</button>
-      </div>  
-
-      <!-- ARTISTS -->  
-      <div id="panel-Artists" style="display:none;">  
-        <h2>All Artists</h2>  
-        <div id="artistsListContainer"></div>  
-      </div>  
-
-      <div id="panel-CreateArtist" style="display:none;">  
-        <h2>Create Artist</h2>  
-        <p>Artist Name:</p>  
-        <input type="text" id="artistNameInput" placeholder="Enter artist name">  
-
-        <p>Upload Thumbnail:</p>  
-        <input type="file" accept="image/*" id="thumbnailInputArtists">  
-        <div id="thumbnailPreviewArtists"></div>  
-
-        <p>Biography:</p>  
-        <textarea id="artistBioInput" placeholder="Enter artist biography"></textarea>  
-
-        <p>Social Links:</p>  
-        <input type="text" id="artistInstagramInput" placeholder="Instagram URL">  
-        <input type="text" id="artistTikTokInput" placeholder="TikTok URL">  
-        <input type="text" id="artistYouTubeInput" placeholder="YouTube URL">  
-        <input type="text" id="artistSpotifyInput" placeholder="Spotify URL">  
-
-        <p>Featured Artist:</p>  
-        <input type="checkbox" id="artistFeaturedInput"> Yes  
-        <p>Link existing posts to this Artist:</p>
-        <div id="artistLinkPostsContainer">
-          <em>No posts yet. Create posts first.</em>
-        </div>
-        <button onclick="createArtist()" style="padding:6px 12px; background:#2271b1; color:#fff; border-radius:4px;">Save Artist</button>  
-      </div>  
-    </div>
-  </main>      
+    </main>
+  </div>
 
 <script>
-  // Backend Configuration
-  const BACKEND_URL = 'https://cms.zedtopvibes.workers.dev'; // Your Cloudflare Worker URL
-  const AUTH_TOKEN = 'your-secret-token'; // Must match backend token
+  // ===============================
+  // AUTHENTICATION LOGIC
+  // ===============================
+  const API_BASE = 'https://cms.zedtopvibes.workers.dev/api';
+  const LOGIN_ENDPOINT = `${API_BASE}/login`;
+  const VERIFY_ENDPOINT = `${API_BASE}/verify`;
+  const SESSION_KEY = 'cms_session_id';
+
+  // DOM Elements
+  const loginContainer = document.getElementById('loginContainer');
+  const dashboardContainer = document.getElementById('dashboardContainer');
+  const loginFormElement = document.getElementById('loginFormElement');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = document.getElementById('btnText');
+  const loadingIndicator = document.getElementById('loadingIndicator');
+  const errorMessage = document.getElementById('errorMessage');
+  const successMessage = document.getElementById('successMessage');
+  const statusIndicator = document.getElementById('statusIndicator');
+
+  // Password toggle functionality
+  let passwordVisible = false;
+  togglePasswordBtn.addEventListener('click', () => {
+    passwordVisible = !passwordVisible;
+    passwordInput.type = passwordVisible ? 'text' : 'password';
+    togglePasswordBtn.textContent = passwordVisible ? '🙈' : '👁';
+  });
+
+  // Set loading state
+  function setLoading(isLoading) {
+    if (isLoading) {
+      submitBtn.disabled = true;
+      btnText.classList.add('hidden');
+      loadingIndicator.classList.remove('hidden');
+    } else {
+      submitBtn.disabled = false;
+      btnText.classList.remove('hidden');
+      loadingIndicator.classList.add('hidden');
+    }
+  }
+
+  // Show error message
+  function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.classList.add('visible');
+    errorMessage.classList.add('shake');
+    successMessage.classList.remove('visible');
+    
+    setTimeout(() => {
+      errorMessage.classList.remove('shake');
+    }, 500);
+  }
+
+  // Show success message
+  function showSuccess(message) {
+    successMessage.textContent = message;
+    successMessage.classList.add('visible');
+    errorMessage.classList.remove('visible');
+  }
+
+  // Clear messages
+  function clearMessages() {
+    errorMessage.classList.remove('visible');
+    successMessage.classList.remove('visible');
+  }
+
+  // Store session
+  function storeSession(sessionId) {
+    localStorage.setItem(SESSION_KEY, sessionId);
+  }
+
+  // Get session
+  function getSession() {
+    return localStorage.getItem(SESSION_KEY);
+  }
+
+  // Clear session
+  function clearSession() {
+    localStorage.removeItem(SESSION_KEY);
+  }
+
+  // Verify session with backend
+  async function verifySession() {
+    const sessionId = getSession();
+    
+    if (!sessionId) {
+      return { valid: false, username: null };
+    }
+
+    try {
+      statusIndicator.classList.add('visible');
+      statusIndicator.textContent = 'Verifying session...';
+      
+      const response = await fetch(VERIFY_ENDPOINT, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${sessionId}`
+        }
+      });
+
+      statusIndicator.classList.remove('visible');
+
+      if (response.ok) {
+        const data = await response.json();
+        return { valid: true, username: data.username };
+      } else {
+        clearSession();
+        return { valid: false, username: null };
+      }
+    } catch (error) {
+      console.error('Session verification error:', error);
+      statusIndicator.classList.remove('visible');
+      return { valid: false, username: null };
+    }
+  }
+
+  // Handle login form submission
+  async function handleLogin(event) {
+    event.preventDefault();
+    
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!username || !password) {
+      showError('Please fill in all fields');
+      return;
+    }
+
+    clearMessages();
+    setLoading(true);
+
+    try {
+      const response = await fetch(LOGIN_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.sessionId) {
+        storeSession(data.sessionId);
+        showSuccess('Login successful!');
+        
+        setTimeout(() => {
+          showDashboard(username);
+        }, 1000);
+      } else {
+        showError(data.error || 'Invalid credentials');
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      showError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Show dashboard
+  function showDashboard(username) {
+    loginContainer.style.display = 'none';
+    dashboardContainer.style.display = 'block';
+    console.log(`Logged in as ${username}`);
+  }
+
+  // Logout function
+  function logout() {
+    clearSession();
+    loginContainer.style.display = 'flex';
+    dashboardContainer.style.display = 'none';
+    
+    // Clear form
+    usernameInput.value = '';
+    passwordInput.value = '';
+    passwordInput.type = 'password';
+    togglePasswordBtn.textContent = '👁';
+    passwordVisible = false;
+    
+    showSuccess('You have been logged out successfully.');
+    usernameInput.focus();
+  }
+
+  // Initialize the page
+  async function init() {
+    // Check for existing valid session
+    statusIndicator.classList.add('visible');
+    statusIndicator.textContent = 'Checking session...';
+    
+    const session = await verifySession();
+    
+    if (session.valid) {
+      showDashboard(session.username);
+    } else {
+      loginContainer.style.display = 'flex';
+      dashboardContainer.style.display = 'none';
+    }
+    
+    statusIndicator.classList.remove('visible');
+
+    // Event Listeners
+    loginFormElement.addEventListener('submit', handleLogin);
+
+    // Handle Enter key in form
+    loginFormElement.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !submitBtn.disabled) {
+        handleLogin(e);
+      }
+    });
+
+    // Clear error when user starts typing
+    [usernameInput, passwordInput].forEach(input => {
+      input.addEventListener('input', () => {
+        if (errorMessage.classList.contains('visible')) {
+          clearMessages();
+        }
+      });
+    });
+  }
+
+  // Start the application
+  document.addEventListener('DOMContentLoaded', init);
+
+  // Auto-refresh session periodically (every 5 minutes)
+  setInterval(async () => {
+    const sessionId = getSession();
+    if (sessionId) {
+      const session = await verifySession();
+      if (!session.valid) {
+        logout();
+        showError('Your session has expired. Please login again.');
+      }
+    }
+  }, 5 * 60 * 1000);
+
+  // ===============================
+  // DASHBOARD LOGIC
+  // ===============================
   
-  // ===============================
   // 1️⃣ SIDEBAR & PAGE SWITCHING
-  // ===============================
   function toggleSidebar() { 
     document.getElementById("sidebar").classList.toggle("open"); 
-  }  
+  }
 
   function toggleDropdown(id){ 
     const el = document.getElementById(id); 
     el.style.display = el.style.display === 'none' ? 'block' : 'none'; 
-  }  
+  }
 
   function setPage(title, el){  
     document.getElementById("pageTitle").textContent = title;  
@@ -462,10 +890,6 @@ body.dark-mode button {
     
     if(title === 'Analytics'){
       renderAnalytics();
-    } else if(title === 'File Manager'){
-      loadFileManager();
-    } else if(title === 'Settings'){
-      // Load backend info
     }
 
     // ✅ Reset post search ONLY when Posts page is opened
@@ -480,9 +904,7 @@ body.dark-mode button {
     renderArtistLinkPosts();
   }
 
-  // ===============================
-  // 1️⃣2️⃣ POST TYPE TOGGLE (NEW FUNCTION)
-  // ===============================
+  // 2️⃣ POST TYPE TOGGLE
   function toggleAlbumSelect() {
     const postType = document.getElementById('postTypeSelect').value;
     const albumContainer = document.getElementById('albumSelectContainer');
@@ -497,9 +919,7 @@ body.dark-mode button {
     }
   }
 
-  // ===============================
-  // 2️⃣ UPLOAD PREVIEWS
-  // ===============================
+  // 3️⃣ UPLOAD PREVIEWS
   function setupPreview(inputId, previewId, maxWidth=100, maxHeight=100){
     const input = document.getElementById(inputId);
     const preview = document.getElementById(previewId);
@@ -522,18 +942,14 @@ body.dark-mode button {
     audioPreviewPosts.textContent=`Selected file: ${file.name}`;  
   });
 
-  // ===============================
-  // 3️⃣ DUMMY STORAGE
-  // ===============================
+  // 4️⃣ DUMMY STORAGE
   const postsList = [];
   const albumsList = [];
   const artistsList = [];
   const postAlbumSelect = document.getElementById('postAlbumSelect');  
   const postArtistSelect = document.getElementById('postArtistSelect');  
-  
-  // ===============================  
-  // 1️⃣1️⃣ Search & Filter Posts  
-  // ===============================
+
+  // 5️⃣ Search & Filter Posts
   function filterPosts() {
     const query = document.getElementById('postSearchInput').value.toLowerCase();
     const genreFilter = document.getElementById('filterGenre').value;
@@ -587,10 +1003,8 @@ body.dark-mode button {
     });
   }
 
-  // ===============================
-  // 4️⃣ CREATE / EDIT POSTS (UPDATED with backend upload)
-  // ===============================
-  async function createPost(){  
+  // 6️⃣ CREATE / EDIT POSTS
+  function createPost(){  
     const name = document.getElementById('postNameInput').value.trim();  
     const postType = document.getElementById('postTypeSelect').value;
     const album = postType === 'album' ? document.getElementById('postAlbumSelect').value : '';
@@ -600,8 +1014,8 @@ body.dark-mode button {
     if(postType === 'album' && !album){ alert('Please select an album for Album posts'); return; }  
     if(!artist){ alert('Please select an artist'); return; }  
 
-    const thumbnailFile = document.getElementById('thumbnailInputPosts').files[0];
-    const audioFile = document.getElementById('audioInputPosts').files[0];
+    const thumbnail = document.getElementById('thumbnailPreviewPosts').querySelector('img')?.src || '';  
+    const audio = document.getElementById('audioInputPosts').files[0]?.name || '';  
     const description = document.getElementById('postDescriptionInput').value.trim();  
     const genre = document.getElementById('postGenreSelect').value;  
     const releaseDate = document.getElementById('postReleaseDate').value;  
@@ -612,61 +1026,42 @@ body.dark-mode button {
     const publishToggle = document.getElementById('postPublishToggle')?.checked || false;
     const status = publishToggle ? 'published' : 'draft';
 
-    try {
-      // Upload files to backend
-      let thumbnailUrl = '';
-      let audioUrl = '';
-      
-      if (thumbnailFile) {
-        thumbnailUrl = await uploadToBackend(thumbnailFile, 'thumbnail_');
-      }
-      
-      if (audioFile) {
-        audioUrl = await uploadToBackend(audioFile, 'audio_');
-      }
+    const post = { 
+      title: name, 
+      type: postType,
+      album, 
+      artist, 
+      thumbnail, 
+      audio, 
+      description, 
+      genre, 
+      releaseDate, 
+      tags, 
+      featured, 
+      externalLink,
+      status,
+      dateCreated: new Date().toISOString()
+    };  
 
-      const post = { 
-        title: name, 
-        type: postType,
-        album, 
-        artist, 
-        thumbnail: thumbnailUrl,
-        audio: audioUrl,
-        description, 
-        genre, 
-        releaseDate, 
-        tags, 
-        featured, 
-        externalLink,
-        status,
-        dateCreated: new Date().toISOString()
-      };  
+    postsList.push(post);  
 
-      postsList.push(post);  
+    alert(`Post "${name}" (${postType}) linked to Artist "${artist}" saved as ${status}!`);  
 
-      alert(`Post "${name}" (${postType}) linked to Artist "${artist}" saved as ${status}!`);  
+    ['postNameInput','postDescriptionInput','postGenreSelect','postReleaseDate','postTagsInput','postExternalLink'].forEach(id=>document.getElementById(id).value='');  
+    document.getElementById('postFeaturedInput').checked=false;  
+    document.getElementById('thumbnailInputPosts').value=''; 
+    document.getElementById('audioInputPosts').value='';  
+    document.getElementById('thumbnailPreviewPosts').innerHTML=''; 
+    audioPreviewPosts.textContent='';  
+    if(document.getElementById('postPublishToggle')) document.getElementById('postPublishToggle').checked=false;
 
-      ['postNameInput','postDescriptionInput','postGenreSelect','postReleaseDate','postTagsInput','postExternalLink'].forEach(id=>document.getElementById(id).value='');  
-      document.getElementById('postFeaturedInput').checked=false;  
-      document.getElementById('thumbnailInputPosts').value=''; 
-      document.getElementById('audioInputPosts').value='';  
-      document.getElementById('thumbnailPreviewPosts').innerHTML=''; 
-      audioPreviewPosts.textContent='';  
-      if(document.getElementById('postPublishToggle')) document.getElementById('postPublishToggle').checked=false;
-
-      updateAlbumsList();  
-      updateArtistsList();  
-      updatePostsList();  
-      
-    } catch (error) {
-      alert('Error uploading files: ' + error.message);
-    }
+    updateAlbumsList();  
+    updateArtistsList();  
+    updatePostsList();  
   }
 
-  // ===============================
-  // 4️⃣1️⃣ Publish Draft (UPDATED)
-  // ===============================
-  async function publishDraft() {
+  // 7️⃣ Publish Draft
+  function publishDraft() {
     const name = document.getElementById('postNameInput').value.trim();
     const postType = document.getElementById('postTypeSelect').value;
     const album = postType === 'album' ? document.getElementById('postAlbumSelect').value : '';
@@ -676,8 +1071,8 @@ body.dark-mode button {
     if(postType === 'album' && !album){ alert('Please select an album for Album posts'); return; }
     if(!artist){ alert('Please select an artist'); return; }
 
-    const thumbnailFile = document.getElementById('thumbnailInputPosts').files[0];
-    const audioFile = document.getElementById('audioInputPosts').files[0];
+    const thumbnail = document.getElementById('thumbnailPreviewPosts').querySelector('img')?.src || '';
+    const audio = document.getElementById('audioInputPosts').files[0]?.name || '';
     const description = document.getElementById('postDescriptionInput').value.trim();
     const genre = document.getElementById('postGenreSelect').value;
     const releaseDate = document.getElementById('postReleaseDate').value;
@@ -687,56 +1082,39 @@ body.dark-mode button {
 
     const status = 'published';
 
-    try {
-      let thumbnailUrl = '';
-      let audioUrl = '';
-      
-      if (thumbnailFile) {
-        thumbnailUrl = await uploadToBackend(thumbnailFile, 'thumbnail_');
-      }
-      
-      if (audioFile) {
-        audioUrl = await uploadToBackend(audioFile, 'audio_');
-      }
+    const post = { 
+      title:name, 
+      type: postType,
+      album, 
+      artist, 
+      thumbnail, 
+      audio, 
+      description, 
+      genre, 
+      releaseDate, 
+      tags, 
+      featured, 
+      externalLink, 
+      status 
+    };
 
-      const post = { 
-        title:name, 
-        type: postType,
-        album, 
-        artist, 
-        thumbnail: thumbnailUrl,
-        audio: audioUrl,
-        description, 
-        genre, 
-        releaseDate, 
-        tags, 
-        featured, 
-        externalLink, 
-        status 
-      };
+    postsList.push(post);
 
-      postsList.push(post);
+    alert(`Post "${name}" (${postType}) published!`);
 
-      alert(`Post "${name}" (${postType}) published!`);
+    ['postNameInput','postDescriptionInput','postGenreSelect','postReleaseDate','postTagsInput','postExternalLink'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('postFeaturedInput').checked=false;
+    document.getElementById('thumbnailInputPosts').value='';
+    document.getElementById('audioInputPosts').value='';
+    document.getElementById('thumbnailPreviewPosts').innerHTML='';
+    audioPreviewPosts.textContent='';
 
-      ['postNameInput','postDescriptionInput','postGenreSelect','postReleaseDate','postTagsInput','postExternalLink'].forEach(id=>document.getElementById(id).value='');
-      document.getElementById('postFeaturedInput').checked=false;
-      document.getElementById('thumbnailInputPosts').value='';
-      document.getElementById('audioInputPosts').value='';
-      document.getElementById('thumbnailPreviewPosts').innerHTML='';
-      audioPreviewPosts.textContent='';
-
-      updateAlbumsList();
-      updateArtistsList();
-      updatePostsList();
-    } catch (error) {
-      alert('Error uploading files: ' + error.message);
-    }
+    updateAlbumsList();
+    updateArtistsList();
+    updatePostsList();
   }
 
-  // ===============================
-  // 5️⃣ CREATE / EDIT ALBUMS
-  // ===============================
+  // 8️⃣ CREATE / EDIT ALBUMS
   let currentEditingAlbumIndex = null;
 
   function editAlbum(index){
@@ -748,21 +1126,11 @@ body.dark-mode button {
     setPage('CreateAlbum', null);
   }
 
-  async function createAlbum(){
+  function createAlbum(){
     const name = document.getElementById('albumNameInput').value.trim();
     if(!name){ alert('Album name required'); return; }
     const desc = document.getElementById('albumDescriptionInput').value.trim();
-    const thumbFile = document.getElementById('thumbnailInputAlbums').files[0];
-
-    let thumb = '';
-    if (thumbFile) {
-      try {
-        thumb = await uploadToBackend(thumbFile, 'album_');
-      } catch (error) {
-        alert('Error uploading thumbnail: ' + error.message);
-        return;
-      }
-    }
+    const thumb = document.getElementById('thumbnailPreviewAlbums').querySelector('img')?.src || '';
 
     if(currentEditingAlbumIndex === null){
       const album = {name, description:desc, thumbnail:thumb};
@@ -791,9 +1159,7 @@ body.dark-mode button {
     updatePostsList();
   }
 
-  // ===============================
-  // 6️⃣ CREATE / EDIT ARTISTS
-  // ===============================
+  // 9️⃣ CREATE / EDIT ARTISTS
   let currentEditingArtistIndex = null;
 
   function renderArtistLinkPosts(artistName = ''){
@@ -827,11 +1193,11 @@ body.dark-mode button {
     renderArtistLinkPosts(artist.name);
   }
 
-  async function createArtist(){
+  function createArtist(){
     const name = document.getElementById('artistNameInput').value.trim();
     if(!name){ alert('Artist name required'); return; }
 
-    const thumbFile = document.getElementById('thumbnailInputArtists').files[0];
+    const thumbnail = document.getElementById('thumbnailPreviewArtists').querySelector('img')?.src || '';
     const bio = document.getElementById('artistBioInput').value.trim();
     const instagram = document.getElementById('artistInstagramInput').value.trim();
     const tiktok = document.getElementById('artistTikTokInput').value.trim();
@@ -840,16 +1206,6 @@ body.dark-mode button {
     const featured = document.getElementById('artistFeaturedInput').checked;
     const container = document.getElementById('artistLinkPostsContainer');
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-
-    let thumbnail = '';
-    if (thumbFile) {
-      try {
-        thumbnail = await uploadToBackend(thumbFile, 'artist_');
-      } catch (error) {
-        alert('Error uploading thumbnail: ' + error.message);
-        return;
-      }
-    }
 
     if(currentEditingArtistIndex === null){
       const artist={name,thumbnail,bio,instagram,tiktok,youtube,spotify,featured};
@@ -890,9 +1246,7 @@ body.dark-mode button {
     updatePostsList();
   }
 
-  // ===============================
-  // 7️⃣ UPDATE POSTS LIST (UPDATED)
-  // ===============================
+  // 🔟 UPDATE POSTS LIST
   function updatePostsList(){  
     const container=document.getElementById('postsListContainer'); container.innerHTML='';  
     postsList.forEach(post=>{  
@@ -908,30 +1262,13 @@ body.dark-mode button {
                        Featured: ${post.featured ? 'Yes' : 'No'} <br>  
                        External Link: ${post.externalLink || 'N/A'} <br>  
                        Description: ${post.description || 'N/A'} <br>`;  
-      if(post.thumbnail) {
-        if(post.thumbnail.startsWith('http') || post.thumbnail.startsWith('/')) {
-          div.innerHTML += `<img src="${post.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"> <br>`;  
-        } else {
-          // Display from backend
-          div.innerHTML += `<img src="${BACKEND_URL}/download/${post.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"> <br>`;  
-        }
-      }
-      if(post.audio) {
-        if(post.audio.startsWith('http') || post.audio.startsWith('/')) {
-          div.innerHTML += `<div class="audio-player"><audio controls><source src="${post.audio}" type="audio/mpeg">Your browser does not support audio.</audio></div><br>`;  
-        } else {
-          // Stream from backend
-          div.innerHTML += `<div class="audio-player"><audio controls><source src="${BACKEND_URL}/stream/${post.audio}" type="audio/mpeg">Your browser does not support audio.</audio></div><br>`;  
-        }
-      }
+      if(post.thumbnail) div.innerHTML += `<img src="${post.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"> <br>`;  
+      if(post.audio) div.innerHTML += `Audio: ${post.audio} <br>`;  
       container.appendChild(div);  
     });  
   }
-  
-  // ===============================
-  // 8️⃣ UNLINK POSTS WITHOUT DELETING
-  // ===============================
 
+  // 1️⃣1️⃣ UNLINK POSTS WITHOUT DELETING
   function unlinkAlbumPosts(index){
     const album = albumsList[index];
     if(!confirm(`Are you sure you want to unlink all posts from album "${album.name}"? This will not delete the posts.`)) return;
@@ -966,13 +1303,7 @@ body.dark-mode button {
       const div=document.createElement('div');   
       div.style.border='1px solid #ccc'; div.style.padding='8px'; div.style.marginBottom='8px';
       div.innerHTML = `<strong>${album.name}</strong><br>${album.description || ''}<br>`;
-      if(album.thumbnail) {
-        if(album.thumbnail.startsWith('http') || album.thumbnail.startsWith('/')) {
-          div.innerHTML += `<img src="${album.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`;
-        } else {
-          div.innerHTML += `<img src="${BACKEND_URL}/download/${album.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`;
-        }
-      }
+      if(album.thumbnail) div.innerHTML += `<img src="${album.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`;
       const linkedPosts = postsList.filter(p=>p.album===album.name);
       if(linkedPosts.length){
         const ul=document.createElement('ul'); linkedPosts.forEach(p=>{ const li=document.createElement('li'); li.textContent=`${p.title} (Artist: ${p.artist})`; ul.appendChild(li); });
@@ -999,11 +1330,7 @@ body.dark-mode button {
     artistsList.forEach((artist,index)=>{
       const div=document.createElement('div'); div.style.border='1px solid #ccc'; div.style.padding='8px'; div.style.marginBottom='8px';
       div.innerHTML=`<strong>${artist.name}</strong><br>`+
-                    (artist.thumbnail ? 
-                      (artist.thumbnail.startsWith('http') || artist.thumbnail.startsWith('/') ?
-                        `<img src="${artist.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>` :
-                        `<img src="${BACKEND_URL}/download/${artist.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`) 
-                      : '')+
+                    (artist.thumbnail?`<img src="${artist.thumbnail}" style="max-width:100px; max-height:100px; border:1px solid #ccc; padding:4px; margin-top:4px;"><br>`:'')+
                     (artist.bio?`<em>Bio:</em> ${artist.bio}<br>`:'')+
                     (artist.instagram?`Instagram: <a href="${artist.instagram}" target="_blank">${artist.instagram}</a><br>`:'')+
                     (artist.tiktok?`TikTok: <a href="${artist.tiktok}" target="_blank">${artist.tiktok}</a><br>`:'')+
@@ -1027,10 +1354,7 @@ body.dark-mode button {
     });
   }
 
-  // ===============================
-  // 9️⃣ BULK RELINK POSTS TO ALBUM/ARTIST
-  // ===============================
-
+  // 1️⃣2️⃣ BULK RELINK POSTS TO ALBUM/ARTIST
   function openBulkRelink(){
     const container = document.getElementById('postsListContainer');
     if(!postsList.length){ alert('No posts to relink.'); return; }
@@ -1125,184 +1449,15 @@ body.dark-mode button {
   bulkBtn.onclick = openBulkRelink;
   postsPanel.insertBefore(bulkBtn, postsPanel.firstChild);
 
-  // ===============================
-  // 🔟 BACKEND INTEGRATION FUNCTIONS
-  // ===============================
-
-  async function uploadToBackend(file, prefix = '') {
-    const formData = new FormData();
-    const timestamp = Date.now();
-    const filename = prefix + timestamp + '_' + file.name;
-    formData.append('file', file);
-    formData.append('filename', filename);
-
-    const response = await fetch(`${BACKEND_URL}/upload`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${AUTH_TOKEN}`
-      },
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.filename;
-  }
-
-  async function uploadFile() {
-    const fileInput = document.getElementById('fileUploadInput');
-    const files = fileInput.files;
-    
-    if (files.length === 0) {
-      alert('Please select files to upload');
-      return;
-    }
-
-    const progressDiv = document.getElementById('uploadProgress');
-    progressDiv.innerHTML = '<p>Uploading files...</p>';
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      try {
-        progressDiv.innerHTML += `<p>Uploading ${file.name}...</p>`;
-        await uploadToBackend(file);
-        progressDiv.innerHTML += `<p style="color: green;">✓ ${file.name} uploaded successfully</p>`;
-      } catch (error) {
-        progressDiv.innerHTML += `<p style="color: red;">✗ ${file.name} failed: ${error.message}</p>`;
-      }
-    }
-
-    // Refresh file list
-    loadFileManager();
-    
-    // Clear file input
-    fileInput.value = '';
-  }
-
-  async function loadFileManager() {
-    try {
-      const response = await fetch(`${BACKEND_URL}/files`);
-      if (!response.ok) throw new Error('Failed to load files');
-      
-      const data = await response.json();
-      if (!data.success) throw new Error(data.error || 'Unknown error');
-
-      // Update stats
-      const statsGrid = document.getElementById('statsGrid');
-      statsGrid.innerHTML = `
-        <div class="stat-box">
-          <div class="stat-value">${data.total_files}</div>
-          <div class="stat-label">Total Files</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">${data.total_downloads}</div>
-          <div class="stat-label">Total Downloads</div>
-        </div>
-      `;
-
-      // Update file grid
-      const fileGrid = document.getElementById('fileGrid');
-      fileGrid.innerHTML = '';
-
-      data.files.forEach(file => {
-        const fileCard = document.createElement('div');
-        fileCard.className = 'file-card';
-        
-        let preview = '';
-        const ext = file.key.split('.').pop().toLowerCase();
-        
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-          preview = `<img src="${BACKEND_URL}/download/${file.key}" alt="${file.key}">`;
-        } else if (ext === 'mp3') {
-          preview = `<div class="audio-player"><audio controls><source src="${BACKEND_URL}/stream/${file.key}" type="audio/mpeg"></audio></div>`;
-        } else {
-          preview = `<div style="text-align: center; padding: 20px; background: #f0f0f1; border-radius: 4px;">
-            <strong>${ext.toUpperCase()}</strong><br>
-            <small>${file.key}</small>
-          </div>`;
-        }
-
-        fileCard.innerHTML = `
-          ${preview}
-          <div style="margin-top: 10px;">
-            <strong>${file.key}</strong><br>
-            <small>Size: ${formatFileSize(file.size)}</small><br>
-            <small>Downloads: ${file.downloads}</small>
-          </div>
-          <div class="file-actions">
-            <button class="file-action-btn" onclick="copyLink('${file.key}')">Copy Link</button>
-            <button class="file-action-btn" onclick="downloadFile('${file.key}')">Download</button>
-            <button class="file-action-btn delete" onclick="deleteFile('${file.key}')">Delete</button>
-          </div>
-        `;
-
-        fileGrid.appendChild(fileCard);
-      });
-
-    } catch (error) {
-      console.error('Error loading files:', error);
-      document.getElementById('fileGrid').innerHTML = `<p style="color: red;">Error loading files: ${error.message}</p>`;
-    }
-  }
-
-  function copyLink(filename) {
-    const link = `${BACKEND_URL}/download/${filename}`;
-    navigator.clipboard.writeText(link).then(() => {
-      alert('Link copied to clipboard!');
-    });
-  }
-
-  function downloadFile(filename) {
-    window.open(`${BACKEND_URL}/download/${filename}`, '_blank');
-  }
-
-  async function deleteFile(filename) {
-    if (!confirm(`Are you sure you want to delete "${filename}"?`)) return;
-    
-    // Note: Your backend doesn't have a delete endpoint yet
-    // You would need to add one to your worker
-    alert('Delete functionality requires adding DELETE endpoint to backend');
-  }
-
-  async function testBackendConnection() {
-    const resultDiv = document.getElementById('connectionTestResult');
-    resultDiv.innerHTML = '<p>Testing connection...</p>';
-    
-    try {
-      const response = await fetch(BACKEND_URL);
-      if (response.ok) {
-        resultDiv.innerHTML = '<p style="color: green;">✓ Backend connection successful!</p>';
-      } else {
-        resultDiv.innerHTML = `<p style="color: red;">✗ Backend returned status: ${response.status}</p>`;
-      }
-    } catch (error) {
-      resultDiv.innerHTML = `<p style="color: red;">✗ Connection failed: ${error.message}</p>`;
-    }
-  }
-
-  function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  // ===============================
-  // 1️⃣1️⃣ THEME / APPEARANCE SWITCHER
-  // ===============================
-  
+  // 1️⃣3️⃣ THEME / APPEARANCE SWITCHER
   const themeBtn = document.getElementById('themeToggleBtn');
   
   const currentTheme = localStorage.getItem('cmsTheme');
-  if(currentTheme === 'dark') document.body.classList.add('dark-mode');
+  if(currentTheme === 'dark') dashboardContainer.classList.add('dark-mode');
   
   themeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    if(document.body.classList.contains('dark-mode')) {
+    dashboardContainer.classList.toggle('dark-mode');
+    if(dashboardContainer.classList.contains('dark-mode')) {
       localStorage.setItem('cmsTheme','dark');
       themeBtn.textContent = '☀️';
     } else {
@@ -1311,15 +1466,13 @@ body.dark-mode button {
     }
   });
   
-  if(document.body.classList.contains('dark-mode')) themeBtn.textContent = '☀️';
+  if(dashboardContainer.classList.contains('dark-mode')) themeBtn.textContent = '☀️';
   else themeBtn.textContent = '🌙';
 
-  // ===============================
-  // 1️⃣2️⃣ ANALYTICS
-  // ===============================
+  // 1️⃣4️⃣ ANALYTICS
   function renderAnalytics() {
     const container = document.getElementById('panel-Analytics');
-    container.innerHTML = ''; // Clear placeholder
+    container.innerHTML = '';
 
     // ===== Stats =====
     const totalPosts = postsList.length;
@@ -1361,7 +1514,7 @@ body.dark-mode button {
 
     // ===== Recent Posts =====
     const recentPostsList = document.getElementById('recentPostsList');
-    const recentPosts = postsList.slice(-5).reverse(); // last 5 posts
+    const recentPosts = postsList.slice(-5).reverse();
     if(!recentPosts.length){
       recentPostsList.innerHTML = '<em>No posts yet.</em>';
       return;
@@ -1374,7 +1527,7 @@ body.dark-mode button {
   }
 
   // ===============================
-  // INITIALIZE
+  // INITIALIZE DASHBOARD
   // ===============================
   updateAlbumsList();  
   updateArtistsList();  
@@ -1382,13 +1535,8 @@ body.dark-mode button {
   
   // Initialize post type toggle on page load
   document.addEventListener('DOMContentLoaded', function() {
-    toggleAlbumSelect(); // Set initial state
-    
-    // Test backend connection on load
-    setTimeout(() => {
-      testBackendConnection();
-    }, 1000);
+    toggleAlbumSelect();
   });
 </script>
-</body>  
+</body>
 </html>
