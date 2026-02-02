@@ -6,12 +6,15 @@
 <title>CMS Admin Dashboard</title>
 <style>
 body { font-family: Arial; margin: 20px; }
+h2 { margin-top: 30px; }
 form { margin-bottom: 20px; }
-input, textarea { display: block; margin: 10px 0; width: 300px; padding: 5px; }
-button { padding: 5px 10px; cursor: pointer; }
+input, textarea, select { display: block; margin: 5px 0 15px 0; padding: 5px; width: 300px; }
+button { padding: 5px 10px; margin-top: 5px; }
 #status { margin-top: 10px; color: green; }
 #status.error { color: red; }
-#postForm { display: none; margin-top: 20px; }
+.section { border-top: 1px solid #ccc; padding-top: 20px; margin-top: 20px; }
+.list-item { margin-bottom: 10px; }
+.list-item button { margin-left: 10px; }
 </style>
 </head>
 <body>
@@ -26,78 +29,252 @@ button { padding: 5px 10px; cursor: pointer; }
 
 <div id="status"></div>
 
-<div id="postForm">
-  <h2>Posts Section</h2>
-  <p>Welcome! You are logged in.</p>
+<div id="adminDashboard" style="display:none;">
+
   <button id="logoutBtn">Logout</button>
+
+  <!-- ===== ARTISTS SECTION ===== -->
+  <div class="section" id="artistsSection">
+    <h2>Artists</h2>
+    <form id="artistForm">
+      <input type="text" name="name" placeholder="Artist Name" required />
+      <textarea name="bio" placeholder="Artist Bio"></textarea>
+      <button type="button" id="addArtistBtn">Add Artist</button>
+    </form>
+    <div id="artistsList"></div>
+  </div>
+
+  <!-- ===== ALBUMS SECTION ===== -->
+  <div class="section" id="albumsSection">
+    <h2>Albums</h2>
+    <form id="albumForm">
+      <input type="text" name="name" placeholder="Album Name" required />
+      <select name="artist_id" required></select>
+      <textarea name="description" placeholder="Album Description"></textarea>
+      <input type="date" name="release_date" />
+      <button type="button" id="addAlbumBtn">Add Album</button>
+    </form>
+    <div id="albumsList"></div>
+  </div>
+
+  <!-- ===== SONGS SECTION ===== -->
+  <div class="section" id="songsSection">
+    <h2>Songs</h2>
+    <form id="songForm">
+      <input type="text" name="name" placeholder="Song Name" required />
+      <select name="artist_id" required></select>
+      <select name="album_id" required></select>
+      <input type="number" name="duration" placeholder="Duration in seconds" />
+      <input type="text" name="file_url" placeholder="File URL" />
+      <button type="button" id="addSongBtn">Add Song</button>
+    </form>
+    <div id="songsList"></div>
+  </div>
+
 </div>
 
 <script>
-const API_URL = "https://cms.zedtopvibes.workers.dev/login";
+const WORKER_URL = "https://cms.zedtopvibes.workers.dev";
 let token = localStorage.getItem("sessionToken") || "";
 
-// ===== Auto-login if token exists =====
-window.addEventListener("DOMContentLoaded", () => {
-  if(token){
-    document.getElementById("loginForm").style.display = "none";
-    document.getElementById("postForm").style.display = "block";
-    document.getElementById("status").innerText = "Session restored.";
-  }
-});
+// ===== STATUS =====
+const statusEl = document.getElementById("status");
+const setStatus = (msg, error=false) => {
+  statusEl.innerText = msg;
+  statusEl.className = error ? "error" : "";
+};
 
-// ===== Login Button Click =====
+// ===== LOGIN =====
 document.getElementById("loginBtn").addEventListener("click", async () => {
   const form = document.getElementById("loginForm");
-  const statusEl = document.getElementById("status");
-  const loginBtn = document.getElementById("loginBtn");
-
-  const data = {
-    username: form.username.value,
-    password: form.password.value
-  };
-
-  statusEl.innerText = "Logging in...";
-  statusEl.classList.remove("error");
-  loginBtn.disabled = true;
-
+  setStatus("Logging in...");
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch(`${WORKER_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify({ username: form.username.value, password: form.password.value })
     });
-
-    const result = await res.json();
-
-    if (result.success) {
-      token = result.token;
+    const data = await res.json();
+    if (data.success) {
+      token = data.token;
       localStorage.setItem("sessionToken", token);
-
-      statusEl.innerText = "Login successful!";
-      form.style.display = "none";
-      document.getElementById("postForm").style.display = "block";
-    } else {
-      statusEl.innerText = "Login failed: " + result.message;
-      statusEl.classList.add("error");
-    }
+      setStatus("Login successful!");
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("adminDashboard").style.display = "block";
+      loadAllData();
+    } else setStatus("Login failed: " + data.message, true);
   } catch(err) {
-    statusEl.innerText = "Login error: " + err.message;
-    statusEl.classList.add("error");
-  } finally {
-    loginBtn.disabled = false;
+    setStatus("Login error: " + err.message, true);
   }
 });
 
-// ===== Logout Button =====
+// ===== LOGOUT =====
 document.getElementById("logoutBtn").addEventListener("click", () => {
   token = "";
   localStorage.removeItem("sessionToken");
-  document.getElementById("postForm").style.display = "none";
+  document.getElementById("adminDashboard").style.display = "none";
   document.getElementById("loginForm").style.display = "block";
-  const statusEl = document.getElementById("status");
-  statusEl.innerText = "Logged out successfully.";
-  statusEl.classList.remove("error");
+  setStatus("Logged out successfully.");
 });
+
+// ===== HELPER FETCH =====
+const authFetch = (url, options={}) => {
+  options.headers = options.headers || {};
+  options.headers["Cookie"] = `zed_session=${token}`;
+  return fetch(url, options);
+};
+
+// ===== ARTISTS =====
+const artistsListEl = document.getElementById("artistsList");
+const artistForm = document.getElementById("artistForm");
+document.getElementById("addArtistBtn").addEventListener("click", async () => {
+  const data = {
+    name: artistForm.name.value,
+    bio: artistForm.bio.value
+  };
+  try {
+    const res = await authFetch(`${WORKER_URL}/artists`, { method:"POST", body:JSON.stringify(data), headers:{"Content-Type":"application/json"} });
+    const artist = await res.json();
+    if(res.ok){ artistForm.reset(); loadArtists(); }
+    else setStatus(artist.error, true);
+  } catch(e){ setStatus(e.message,true); }
+});
+
+const loadArtists = async () => {
+  try {
+    const res = await authFetch(`${WORKER_URL}/artists`);
+    const data = await res.json();
+    artistsListEl.innerHTML = "";
+    const artistSelects = document.querySelectorAll("#albumForm select[name='artist_id'], #songForm select[name='artist_id']");
+    artistSelects.forEach(s => s.innerHTML = "<option value=''>Select Artist</option>");
+    data.forEach(a=>{
+      const div = document.createElement("div");
+      div.className = "list-item";
+      div.innerHTML = `${a.name} <button onclick="deleteArtist('${a.id}')">Delete</button>`;
+      artistsListEl.appendChild(div);
+
+      // populate selects
+      artistSelects.forEach(s=>{
+        const opt = document.createElement("option");
+        opt.value = a.id;
+        opt.text = a.name;
+        s.appendChild(opt);
+      });
+    });
+  } catch(e){ setStatus(e.message,true); }
+};
+
+window.deleteArtist = async (id)=>{
+  if(!confirm("Delete artist?")) return;
+  try {
+    const res = await authFetch(`${WORKER_URL}/artists/${id}`, { method:"DELETE" });
+    if(res.ok) loadArtists();
+    else { const err = await res.json(); setStatus(err.error,true); }
+  } catch(e){ setStatus(e.message,true); }
+};
+
+// ===== ALBUMS =====
+const albumsListEl = document.getElementById("albumsList");
+const albumForm = document.getElementById("albumForm");
+document.getElementById("addAlbumBtn").addEventListener("click", async () => {
+  const data = {
+    name: albumForm.name.value,
+    artist_id: albumForm.artist_id.value,
+    description: albumForm.description.value,
+    release_date: albumForm.release_date.value
+  };
+  try {
+    const res = await authFetch(`${WORKER_URL}/albums`, { method:"POST", body:JSON.stringify(data), headers:{"Content-Type":"application/json"} });
+    const album = await res.json();
+    if(res.ok){ albumForm.reset(); loadAlbums(); }
+    else setStatus(album.error, true);
+  } catch(e){ setStatus(e.message,true); }
+});
+
+const loadAlbums = async () => {
+  try {
+    const res = await authFetch(`${WORKER_URL}/albums`);
+    const data = await res.json();
+    albumsListEl.innerHTML = "";
+    const albumSelect = document.querySelector("#songForm select[name='album_id']");
+    albumSelect.innerHTML = "<option value=''>Select Album</option>";
+    data.forEach(a=>{
+      const div = document.createElement("div");
+      div.className = "list-item";
+      div.innerHTML = `${a.name} <button onclick="deleteAlbum('${a.id}')">Delete</button>`;
+      albumsListEl.appendChild(div);
+
+      const opt = document.createElement("option");
+      opt.value = a.id;
+      opt.text = a.name;
+      albumSelect.appendChild(opt);
+    });
+  } catch(e){ setStatus(e.message,true); }
+};
+
+window.deleteAlbum = async (id)=>{
+  if(!confirm("Delete album?")) return;
+  try {
+    const res = await authFetch(`${WORKER_URL}/albums/${id}`, { method:"DELETE" });
+    if(res.ok) loadAlbums();
+    else { const err = await res.json(); setStatus(err.error,true); }
+  } catch(e){ setStatus(e.message,true); }
+};
+
+// ===== SONGS =====
+const songsListEl = document.getElementById("songsList");
+const songForm = document.getElementById("songForm");
+document.getElementById("addSongBtn").addEventListener("click", async () => {
+  const data = {
+    name: songForm.name.value,
+    artist_id: songForm.artist_id.value,
+    album_id: songForm.album_id.value,
+    duration: Number(songForm.duration.value),
+    file_url: songForm.file_url.value
+  };
+  try {
+    const res = await authFetch(`${WORKER_URL}/songs`, { method:"POST", body:JSON.stringify(data), headers:{"Content-Type":"application/json"} });
+    const song = await res.json();
+    if(res.ok){ songForm.reset(); loadSongs(); }
+    else setStatus(song.error, true);
+  } catch(e){ setStatus(e.message,true); }
+});
+
+const loadSongs = async () => {
+  try {
+    const res = await authFetch(`${WORKER_URL}/songs`);
+    const data = await res.json();
+    songsListEl.innerHTML = "";
+    data.forEach(s=>{
+      const div = document.createElement("div");
+      div.className = "list-item";
+      div.innerHTML = `${s.name} <button onclick="deleteSong('${s.id}')">Delete</button>`;
+      songsListEl.appendChild(div);
+    });
+  } catch(e){ setStatus(e.message,true); }
+};
+
+window.deleteSong = async (id)=>{
+  if(!confirm("Delete song?")) return;
+  try {
+    const res = await authFetch(`${WORKER_URL}/songs/${id}`, { method:"DELETE" });
+    if(res.ok) loadSongs();
+    else { const err = await res.json(); setStatus(err.error,true); }
+  } catch(e){ setStatus(e.message,true); }
+};
+
+// ===== LOAD ALL DATA =====
+const loadAllData = ()=>{
+  loadArtists();
+  loadAlbums();
+  loadSongs();
+};
+
+if(token){
+  document.getElementById("loginForm").style.display = "none";
+  document.getElementById("adminDashboard").style.display = "block";
+  loadAllData();
+}
 </script>
 
 </body>
