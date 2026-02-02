@@ -5,29 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMS Admin Dashboard</title>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f8; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; }
-  h2 { margin-top:20px; color:#333; }
-  #status { margin-top: 10px; color: green; }
-  #status.error { color: red; }
-
-  form { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1); width:320px; margin-top:20px; }
-  input, select, textarea, button { display:block; margin:10px 0; width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; }
-  button { background:#007bff; color:#fff; font-weight:bold; cursor:pointer; transition:0.2s; border:none; }
-  button:hover { background:#0056b3; }
-
-  #dashboard { display:none; width:90%; max-width:900px; margin-top:20px; }
-  .section { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:20px; }
-  .list-item { padding:8px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
-  .list-item:last-child { border-bottom:none; }
-  .list-item button { width:auto; padding:4px 8px; margin-left:5px; }
-  .edit-btn { background:#28a745; } .edit-btn:hover { background:#1e7e34; }
-  .delete-btn { background:#dc3545; } .delete-btn:hover { background:#a71d2a; }
-  .save-btn { background:#ffc107; } .save-btn:hover { background:#e0a800; color:#000; }
+body { font-family: Arial; margin: 20px; }
+form { margin-bottom: 20px; }
+input, select, textarea, button { display: block; margin: 10px 0; width: 300px; padding: 5px; }
+button { padding: 5px 10px; }
+#status { margin-top: 10px; color: green; }
+#status.error { color: red; }
+#dashboard { display: none; }
+.list-item { margin-bottom: 5px; }
+.list-item input, .list-item select { width: 150px; display: inline-block; margin-right: 5px; }
+.list-item button { display: inline-block; padding: 3px 6px; }
 </style>
 </head>
 <body>
 
-<h2>CMS Admin Login</h2>
+<h2>Admin Login</h2>
 
 <div id="loginForm">
   <form>
@@ -40,52 +32,42 @@
 
 <div id="dashboard">
   <h2>Dashboard</h2>
-  <button id="logoutBtn" style="margin-bottom:20px;">Logout</button>
+  <button id="logoutBtn">Logout</button>
 
-  <!-- ===== ARTISTS ===== -->
-  <div class="section">
-    <h3>Artists</h3>
-    <form id="artistForm">
-      <input type="text" name="name" placeholder="Artist Name" required />
-      <textarea name="bio" placeholder="Artist Bio"></textarea>
-      <button type="button" id="addArtistBtn">Add Artist</button>
-    </form>
-    <div id="artistsList"></div>
-  </div>
+  <h3>Artists</h3>
+  <form id="artistForm">
+    <input type="text" name="name" placeholder="Artist Name" required />
+    <textarea name="bio" placeholder="Artist Bio"></textarea>
+    <button type="button" id="addArtistBtn">Add Artist</button>
+  </form>
+  <div id="artistsList"></div>
 
-  <!-- ===== ALBUMS ===== -->
-  <div class="section">
-    <h3>Albums</h3>
-    <form id="albumForm">
-      <input type="text" name="name" placeholder="Album Name" required />
-      <select name="artist_id" id="albumArtistSelect" required></select>
-      <input type="date" name="release_date" placeholder="Release Date" />
-      <textarea name="description" placeholder="Description"></textarea>
-      <button type="button" id="addAlbumBtn">Add Album</button>
-    </form>
-    <div id="albumsList"></div>
-  </div>
+  <h3>Albums</h3>
+  <form id="albumForm">
+    <input type="text" name="name" placeholder="Album Name" required />
+    <select name="artist_id" id="albumArtistSelect" required></select>
+    <input type="date" name="release_date" placeholder="Release Date" />
+    <textarea name="description" placeholder="Description"></textarea>
+    <button type="button" id="addAlbumBtn">Add Album</button>
+  </form>
+  <div id="albumsList"></div>
 
-  <!-- ===== SONGS ===== -->
-  <div class="section">
-    <h3>Songs</h3>
-    <form id="songForm">
-      <input type="text" name="name" placeholder="Song Name" required />
-      <select name="artist_id" id="songArtistSelect" required></select>
-      <select name="album_id" id="songAlbumSelect" required></select>
-      <input type="number" name="duration" placeholder="Duration (seconds)" />
-      <input type="text" name="file_url" placeholder="File URL" />
-      <button type="button" id="addSongBtn">Add Song</button>
-    </form>
-    <div id="songsList"></div>
-  </div>
+  <h3>Songs</h3>
+  <form id="songForm">
+    <input type="text" name="name" placeholder="Song Name" required />
+    <select name="artist_id" id="songArtistSelect" required></select>
+    <select name="album_id" id="songAlbumSelect" required></select>
+    <input type="number" name="duration" placeholder="Duration (seconds)" />
+    <input type="text" name="file_url" placeholder="File URL" />
+    <button type="button" id="addSongBtn">Add Song</button>
+  </form>
+  <div id="songsList"></div>
 </div>
 
 <script>
 const API_BASE = "https://cms.zedtopvibes.workers.dev";
 let token = localStorage.getItem("token") || "";
 
-// ===== Helper =====
 async function authFetch(url, options={}) {
   options.headers = options.headers || {};
   options.headers["Authorization"] = "Bearer " + token;
@@ -94,7 +76,6 @@ async function authFetch(url, options={}) {
 }
 function setStatus(msg,error=false){ const el=document.getElementById("status"); el.innerText=msg; el.className=error?"error":""; }
 
-// ===== LOGIN =====
 document.getElementById("loginBtn").addEventListener("click", async ()=>{
   const form=document.querySelector("#loginForm form");
   const username=form.username.value;
@@ -108,26 +89,23 @@ document.getElementById("loginBtn").addEventListener("click", async ()=>{
   }catch(err){ setStatus(err.message,true); }
 });
 
-// ===== LOGOUT =====
 document.getElementById("logoutBtn").addEventListener("click", ()=>{
   token=""; localStorage.removeItem("token"); document.getElementById("dashboard").style.display="none"; document.getElementById("loginForm").style.display="block"; setStatus("Logged out successfully.");
 });
 
-// ===== ARTISTS CRUD =====
+// ===== ARTISTS =====
 async function loadArtists(){
-  const res=await authFetch(API_BASE+"/artists");
-  const data=await res.json();
+  const res=await authFetch(API_BASE+"/artists"); const data=await res.json();
   if(!Array.isArray(data)){ setStatus(data.error||"Error",true); return; }
-  const container=document.getElementById("artistsList");
-  container.innerHTML="";
+  const container=document.getElementById("artistsList"); container.innerHTML="";
   const artistSelects=[document.getElementById("albumArtistSelect"),document.getElementById("songArtistSelect")];
   artistSelects.forEach(sel=>sel.innerHTML="<option value=''>Select Artist</option>");
   data.forEach(a=>{
     const div=document.createElement("div"); div.className="list-item";
-    div.innerHTML=`<input type='text' value='${a.name}' id='artist-name-${a.id}' style='flex:1;margin-right:5px;' />
-                   <input type='text' value='${a.bio}' id='artist-bio-${a.id}' style='flex:2;margin-right:5px;' />
-                   <button class='save-btn' onclick='editArtist("${a.id}")'>Save</button>
-                   <button class='delete-btn' onclick='deleteArtist("${a.id}")'>Delete</button>`;
+    div.innerHTML=`<input type='text' value='${a.name}' id='artist-name-${a.id}' />
+                   <input type='text' value='${a.bio}' id='artist-bio-${a.id}' />
+                   <button onclick='editArtist("${a.id}")'>Save</button>
+                   <button onclick='deleteArtist("${a.id}")'>Delete</button>`;
     container.appendChild(div);
     artistSelects.forEach(sel=>{ const opt=document.createElement("option"); opt.value=a.id; opt.textContent=a.name; sel.appendChild(opt); });
   });
@@ -136,14 +114,10 @@ document.getElementById("addArtistBtn").addEventListener("click", async ()=>{
   const form=document.getElementById("artistForm"); const name=form.name.value; const bio=form.bio.value;
   await authFetch(API_BASE+"/artists",{method:"POST", body:JSON.stringify({name,bio})}); form.reset(); loadArtists();
 });
-async function editArtist(id){
-  const name=document.getElementById(`artist-name-${id}`).value;
-  const bio=document.getElementById(`artist-bio-${id}`).value;
-  await authFetch(API_BASE+"/artists/"+id,{method:"PUT",body:JSON.stringify({name,bio})}); loadArtists();
-}
+async function editArtist(id){ const name=document.getElementById(`artist-name-${id}`).value; const bio=document.getElementById(`artist-bio-${id}`).value; await authFetch(API_BASE+"/artists/"+id,{method:"PUT",body:JSON.stringify({name,bio})}); loadArtists(); }
 async function deleteArtist(id){ await authFetch(API_BASE+"/artists/"+id,{method:"DELETE"}); loadArtists(); loadAlbums(); loadSongs(); }
 
-// ===== ALBUMS CRUD =====
+// ===== ALBUMS =====
 async function loadAlbums(){
   const res=await authFetch(API_BASE+"/albums"); const data=await res.json();
   if(!Array.isArray(data)){ setStatus(data.error||"Error",true); return; }
@@ -151,41 +125,35 @@ async function loadAlbums(){
   const albumSelect=document.getElementById("songAlbumSelect"); albumSelect.innerHTML="<option value=''>Select Album</option>";
   data.forEach(a=>{
     const div=document.createElement("div"); div.className="list-item";
-    div.innerHTML=`<input type='text' value='${a.name}' id='album-name-${a.id}' style='flex:2;margin-right:5px;' />
-                   <input type='date' value='${a.release_date}' id='album-date-${a.id}' style='flex:1;margin-right:5px;' />
-                   <input type='text' value='${a.description}' id='album-desc-${a.id}' style='flex:2;margin-right:5px;' />
-                   <select id='album-artist-${a.id}' style='flex:1;margin-right:5px;'></select>
-                   <button class='save-btn' onclick='editAlbum("${a.id}")'>Save</button>
-                   <button class='delete-btn' onclick='deleteAlbum("${a.id}")'>Delete</button>`;
+    div.innerHTML=`<input type='text' value='${a.name}' id='album-name-${a.id}' />
+                   <input type='date' value='${a.release_date}' id='album-date-${a.id}' />
+                   <input type='text' value='${a.description}' id='album-desc-${a.id}' />
+                   <select id='album-artist-${a.id}'></select>
+                   <button onclick='editAlbum("${a.id}")'>Save</button>
+                   <button onclick='deleteAlbum("${a.id}")'>Delete</button>`;
     container.appendChild(div);
-
-    // populate artist select
     fetchArtistsForAlbumSelect(a.id);
-    // populate main album dropdown for songs
     const opt=document.createElement("option"); opt.value=a.id; opt.textContent=a.name; albumSelect.appendChild(opt);
   });
 }
 async function fetchArtistsForAlbumSelect(albumId){
   const res=await authFetch(API_BASE+"/artists"); const data=await res.json();
   const sel=document.getElementById(`album-artist-${albumId}`);
-  sel.innerHTML=""; data.forEach(a=>{ const opt=document.createElement("option"); opt.value=a.id; opt.textContent=a.name; if(a.id==sel.dataset.current) opt.selected=true; sel.appendChild(opt); });
+  sel.innerHTML=""; data.forEach(a=>{ const opt=document.createElement("option"); opt.value=a.id; opt.textContent=a.name; sel.appendChild(opt); });
 }
 document.getElementById("addAlbumBtn").addEventListener("click", async ()=>{
-  const form=document.getElementById("albumForm"); const name=form.name.value; const artist_id=form.artist_id.value;
-  const release_date=form.release_date.value; const description=form.description.value;
+  const form=document.getElementById("albumForm"); const name=form.name.value; const artist_id=form.artist_id.value; const release_date=form.release_date.value; const description=form.description.value;
   if(!artist_id){ setStatus("Select artist",true); return; }
   await authFetch(API_BASE+"/albums",{method:"POST",body:JSON.stringify({name,artist_id,release_date,description})}); form.reset(); loadAlbums();
 });
 async function editAlbum(id){
-  const name=document.getElementById(`album-name-${id}`).value;
-  const release_date=document.getElementById(`album-date-${id}`).value;
-  const description=document.getElementById(`album-desc-${id}`).value;
-  const artist_id=document.getElementById(`album-artist-${id}`).value;
+  const name=document.getElementById(`album-name-${id}`).value; const release_date=document.getElementById(`album-date-${id}`).value;
+  const description=document.getElementById(`album-desc-${id}`).value; const artist_id=document.getElementById(`album-artist-${id}`).value;
   await authFetch(API_BASE+"/albums/"+id,{method:"PUT",body:JSON.stringify({name,release_date,description,artist_id})}); loadAlbums(); loadSongs();
 }
 async function deleteAlbum(id){ await authFetch(API_BASE+"/albums/"+id,{method:"DELETE"}); loadAlbums(); loadSongs(); }
 
-// ===== SONGS CRUD =====
+// ===== SONGS =====
 async function loadSongs(){
   const res=await authFetch(API_BASE+"/songs"); const data=await res.json();
   if(!Array.isArray(data)){ setStatus(data.error||"Error",true); return; }
@@ -193,19 +161,15 @@ async function loadSongs(){
   const albumSelect=document.getElementById("songAlbumSelect"); albumSelect.innerHTML="<option value=''>Select Album</option>";
   data.forEach(s=>{
     const div=document.createElement("div"); div.className="list-item";
-    div.innerHTML=`<input type='text' value='${s.name}' id='song-name-${s.id}' style='flex:2;margin-right:5px;' />
-                   <input type='number' value='${s.duration}' id='song-duration-${s.id}' style='flex:1;margin-right:5px;' />
-                   <input type='text' value='${s.file_url}' id='song-file-${s.id}' style='flex:2;margin-right:5px;' />
-                   <select id='song-artist-${s.id}' style='flex:1;margin-right:5px;'></select>
-                   <select id='song-album-${s.id}' style='flex:1;margin-right:5px;'></select>
-                   <button class='save-btn' onclick='editSong("${s.id}")'>Save</button>
-                   <button class='delete-btn' onclick='deleteSong("${s.id}")'>Delete</button>`;
+    div.innerHTML=`<input type='text' value='${s.name}' id='song-name-${s.id}' />
+                   <input type='number' value='${s.duration}' id='song-duration-${s.id}' />
+                   <input type='text' value='${s.file_url}' id='song-file-${s.id}' />
+                   <select id='song-artist-${s.id}'></select>
+                   <select id='song-album-${s.id}'></select>
+                   <button onclick='editSong("${s.id}")'>Save</button>
+                   <button onclick='deleteSong("${s.id}")'>Delete</button>`;
     container.appendChild(div);
-
-    // populate artist and album selects
-    fetchArtistsForSongSelect(s.id);
-    fetchAlbumsForSongSelect(s.id);
-    // populate main album dropdown
+    fetchArtistsForSongSelect(s.id); fetchAlbumsForSongSelect(s.id);
     const opt=document.createElement("option"); opt.value=s.album_id; opt.textContent=s.name; albumSelect.appendChild(opt);
   });
 }
