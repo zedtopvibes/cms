@@ -175,30 +175,6 @@ const fileInput = document.getElementById("files");
 const errorBox = document.getElementById("error");
 
 /* =========================
-   FILE PREVIEW HELPER
-========================= */
-function previewFile(fileName) {
-  const ext = fileName.split('.').pop().toLowerCase();
-  const previewable = ["jpg","png","pdf","mp4","mp3"];
-  if (!previewable.includes(ext)) return null;
-
-  const url = `${API}/${fileName}`;
-  switch(ext) {
-    case "jpg":
-    case "png":
-      return `<img src="${url}" style="max-width:150px; border-radius:8px; margin-top:6px;">`;
-    case "pdf":
-      return `<a href="${url}" target="_blank">📄 View PDF</a>`;
-    case "mp4":
-      return `<video controls width="200" style="margin-top:6px;"><source src="${url}" type="video/mp4">Your browser does not support video.</video>`;
-    case "mp3":
-      return `<audio controls style="margin-top:6px;"><source src="${url}" type="audio/mpeg">Your browser does not support audio.</audio>`;
-    default:
-      return null;
-  }
-}
-
-/* =========================
    LOAD FILES
 ========================= */
 async function loadFiles() {
@@ -215,14 +191,10 @@ async function loadFiles() {
   files.forEach(f => {
     const div = document.createElement("div");
     div.className = "file";
-
-    const previewHTML = previewFile(f.key) || '';
-
     div.innerHTML = `
       <div>
         <strong>${f.key}</strong><br>
-        <small>${(f.size / 1024).toFixed(1)} KB</small><br>
-        ${previewHTML}
+        <small>${(f.size / 1024).toFixed(1)} KB</small>
       </div>
       <div class="actions">
         <a href="${API}/${f.key}" target="_blank">
