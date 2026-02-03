@@ -83,7 +83,7 @@ button.danger {
 .file {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
 }
@@ -134,6 +134,12 @@ button.danger {
   margin-top: 8px;
   font-size: 14px;
 }
+
+.file img, .file video, .file audio {
+  margin-top: 6px;
+  max-width: 150px;
+  border-radius: 8px;
+}
 </style>
 </head>
 
@@ -175,6 +181,32 @@ const fileInput = document.getElementById("files");
 const errorBox = document.getElementById("error");
 
 /* =========================
+   FILE PREVIEW HELPER
+========================= */
+function previewFile(fileName) {
+  const ext = fileName.split('.').pop().toLowerCase();
+  const previewable = ["jpg","png","pdf","mp4","mp3"];
+  if (!previewable.includes(ext)) return null;
+
+  let url = `${API}/${fileName}`;
+  if (ext === "mp3") url = `${API}/songs/${fileName}`;
+
+  switch(ext) {
+    case "jpg":
+    case "png":
+      return `<img src="${url}" alt="${fileName}">`;
+    case "pdf":
+      return `<a href="${url}" target="_blank">📄 View PDF</a>`;
+    case "mp4":
+      return `<video controls width="200"><source src="${url}" type="video/mp4">Your browser does not support video.</video>`;
+    case "mp3":
+      return `<audio controls><source src="${url}" type="audio/mpeg">Your browser does not support audio.</audio>`;
+    default:
+      return null;
+  }
+}
+
+/* =========================
    LOAD FILES
 ========================= */
 async function loadFiles() {
@@ -191,13 +223,17 @@ async function loadFiles() {
   files.forEach(f => {
     const div = document.createElement("div");
     div.className = "file";
+
+    const previewHTML = previewFile(f.key) || '';
+
     div.innerHTML = `
       <div>
         <strong>${f.key}</strong><br>
-        <small>${(f.size / 1024).toFixed(1)} KB</small>
+        <small>${(f.size / 1024).toFixed(1)} KB</small><br>
+        ${previewHTML}
       </div>
       <div class="actions">
-        <a href="${API}/${f.key}" target="_blank">
+        <a href="${f.key.endsWith('.mp3') ? API + '/songs/' + f.key : API + '/' + f.key}" target="_blank">
           <button>View</button>
         </a>
         <button class="danger" onclick="deleteFile('${f.key}')">Delete</button>
@@ -216,7 +252,7 @@ function isAllowed(file) {
 }
 
 /* =========================
-   UPLOAD WITH PER-FILE PROGRESS
+   UPLOAD WITH PER-FILE PROGRESS & IMMEDIATE DISPLAY
 ========================= */
 fileInput.onchange = () => {
   errorBox.textContent = "";
@@ -271,7 +307,27 @@ function uploadFile(file, container) {
     bar.style.width = "100%";
     text.textContent = "Completed";
     setTimeout(() => item.remove(), 1200);
-    loadFiles();
+
+    // --- Add uploaded file to list immediately ---
+    const div = document.createElement("div");
+    div.className = "file";
+
+    const previewHTML = previewFile(file.name) || '';
+
+    div.innerHTML = `
+      <div>
+        <strong>${file.name}</strong><br>
+        <small>${(file.size / 1024).toFixed(1)} KB</small><br>
+        ${previewHTML}
+      </div>
+      <div class="actions">
+        <a href="${file.name.endsWith('.mp3') ? API + '/songs/' + file.name : API + '/' + file.name}" target="_blank">
+          <button>View</button>
+        </a>
+        <button class="danger" onclick="deleteFile('${file.name}')">Delete</button>
+      </div>
+    `;
+    listEl.prepend(div);
   };
 
   xhr.onerror = () => {
