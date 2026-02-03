@@ -106,62 +106,58 @@
 </main>
 
 <script>
-const API_URL = "https://cms.zedtopvibes.workers.dev/login";
-let token = "";
+const API_URL = "https://cms.zedtopvibes.workers.dev/login"; // your login API
+let token = localStorage.getItem("sessionToken") || "";
 
-// ===== LOGIN =====
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  const form = document.getElementById("loginForm");
-  const statusEl = document.getElementById("status");
+// ===== Check login on page load =====
+window.addEventListener("DOMContentLoaded", () => {
+  if(token) {
+    showDashboard();
+  }
+});
 
-  const data = { username: form.username.value, password: form.password.value };
-  statusEl.innerText = "Logging in...";
-  statusEl.classList.remove("error");
+function showDashboard(){
+  document.querySelector(".topbar .right button[onclick]").style.display = "inline-block"; // show logout
+  document.getElementById("sidebar").style.display = "block"; // ensure sidebar visible
+  document.querySelector(".main").style.display = "block"; // show main content
+}
 
+// ===== Login Function =====
+async function login(username, password){
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify({ username, password })
     });
 
     const result = await res.json();
-
     if(result.success){
       token = result.token;
       localStorage.setItem("sessionToken", token);
-
-      // SHOW DASHBOARD
-      document.getElementById("loginForm").style.display = "none";
-      document.getElementById("topbar").style.display = "flex";
-      document.getElementById("sidebar").style.display = "block";
-      document.getElementById("main").style.display = "block";
+      showDashboard();
+      alert("Login successful!");
     } else {
-      statusEl.innerText = "Login failed: " + result.message;
-      statusEl.classList.add("error");
+      alert("Login failed: " + result.message);
     }
   } catch(err){
-    statusEl.innerText = "Login error: " + err.message;
-    statusEl.classList.add("error");
+    alert("Login error: " + err.message);
   }
-});
+}
 
-// ===== LOGOUT =====
+// ===== Logout Function =====
 function logout(){
   token = "";
   localStorage.removeItem("sessionToken");
-  document.getElementById("loginForm").style.display = "block";
-  document.getElementById("topbar").style.display = "none";
-  document.getElementById("sidebar").style.display = "none";
-  document.getElementById("main").style.display = "none";
-  document.getElementById("status").innerText = "Logged out successfully.";
-  document.getElementById("status").classList.remove("error");
+  document.querySelector(".main").style.display = "none"; 
+  document.getElementById("sidebar").style.display = "none"; 
+  alert("Logged out successfully.");
 }
 
-// ===== DASHBOARD FUNCTIONS =====
+// ===== Sidebar & Page Functions =====
 function toggleSidebar() { 
   document.getElementById("sidebar").classList.toggle("open"); 
-}
+}  
 
 function toggleDropdown(id){ 
   const el = document.getElementById(id); 
@@ -180,6 +176,7 @@ function setPage(title, el){
   if(panel) panel.style.display = 'block';  
 }
 
+// ===== Theme Toggle =====
 document.getElementById('themeToggleBtn').onclick = () => document.body.classList.toggle('dark-mode');
 </script>
 
