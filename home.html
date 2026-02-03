@@ -12,22 +12,25 @@
   --accent: #38bdf8;
   --text: #e5e7eb;
   --danger: #ef4444;
+  --border: #1f2937;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
 
 header {
-  padding: 16px;
   background: #020617;
+  padding: 16px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .container {
@@ -38,21 +41,26 @@ header {
 
 .card {
   background: var(--card);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 16px;
   margin-bottom: 16px;
 }
 
 .upload-box {
   border: 2px dashed #334155;
-  padding: 24px;
+  padding: 28px;
+  border-radius: 14px;
   text-align: center;
-  border-radius: 12px;
   cursor: pointer;
 }
 
 .upload-box:hover {
   border-color: var(--accent);
+}
+
+.upload-box p {
+  margin: 0 0 10px;
+  opacity: 0.85;
 }
 
 input[type=file] {
@@ -61,23 +69,29 @@ input[type=file] {
 
 button {
   background: var(--accent);
+  color: #000;
   border: none;
   padding: 8px 14px;
   border-radius: 8px;
-  cursor: pointer;
   font-weight: 600;
+  cursor: pointer;
 }
 
 button.danger {
   background: var(--danger);
+  color: #fff;
 }
 
 .file {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #1f2933;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.file:last-child {
+  border-bottom: none;
 }
 
 .file small {
@@ -86,6 +100,35 @@ button.danger {
 
 .actions button {
   margin-left: 6px;
+}
+
+.upload-item {
+  margin-top: 12px;
+}
+
+.upload-item strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.progress {
+  width: 100%;
+  height: 8px;
+  background: #1f2937;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.15s;
+}
+
+.upload-item small {
+  opacity: 0.7;
 }
 </style>
 </head>
@@ -96,7 +139,7 @@ button.danger {
 
 <div class="container">
 
-  <!-- Upload -->
+  <!-- Upload Card -->
   <div class="card">
     <label class="upload-box">
       <input type="file" id="files" multiple>
@@ -105,7 +148,7 @@ button.danger {
     </label>
   </div>
 
-  <!-- Files -->
+  <!-- File List -->
   <div class="card">
     <h3>Uploaded Files</h3>
     <div id="list"></div>
@@ -119,7 +162,9 @@ const API = "https://cms.zedtopvibes.workers.dev";
 const listEl = document.getElementById("list");
 const fileInput = document.getElementById("files");
 
-// ===== Load Files =====
+/* =========================
+   LOAD FILES
+========================= */
 async function loadFiles() {
   listEl.innerHTML = "Loading...";
   const res = await fetch(API + "/files");
@@ -143,31 +188,75 @@ async function loadFiles() {
         <a href="${API}/${f.key}" target="_blank">
           <button>View</button>
         </a>
-        <button class="danger" onclick="del('${f.key}')">Delete</button>
+        <button class="danger" onclick="deleteFile('${f.key}')">Delete</button>
       </div>
     `;
     listEl.appendChild(div);
   });
 }
 
-// ===== Upload =====
-fileInput.onchange = async () => {
-  const form = new FormData();
-  for (const file of fileInput.files) {
-    form.append("files", file);
-  }
+/* =========================
+   UPLOAD WITH PER-FILE PROGRESS
+========================= */
+fileInput.onchange = () => {
+  const files = [...fileInput.files];
+  if (!files.length) return;
 
-  await fetch(API + "/upload", {
-    method: "POST",
-    body: form,
-  });
+  const uploadCard = document.createElement("div");
+  uploadCard.className = "card";
+  uploadCard.innerHTML = "<h3>Uploading files…</h3>";
+  document.querySelector(".container").prepend(uploadCard);
 
+  files.forEach(file => uploadFile(file, uploadCard));
   fileInput.value = "";
-  loadFiles();
 };
 
-// ===== Delete =====
-async function del(name) {
+function uploadFile(file, container) {
+  const item = document.createElement("div");
+  item.className = "upload-item";
+  item.innerHTML = `
+    <strong>${file.name}</strong>
+    <div class="progress"><span></span></div>
+    <small>0%</small>
+  `;
+  container.appendChild(item);
+
+  const bar = item.querySelector("span");
+  const text = item.querySelector("small");
+
+  const form = new FormData();
+  form.append("files", file);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", API + "/upload");
+
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      bar.style.width = percent + "%";
+      text.textContent = percent + "%";
+    }
+  };
+
+  xhr.onload = () => {
+    bar.style.width = "100%";
+    text.textContent = "Completed";
+    setTimeout(() => item.remove(), 1200);
+    loadFiles();
+  };
+
+  xhr.onerror = () => {
+    bar.style.background = "#ef4444";
+    text.textContent = "Failed";
+  };
+
+  xhr.send(form);
+}
+
+/* =========================
+   DELETE FILE
+========================= */
+async function deleteFile(name) {
   if (!confirm("Delete this file?")) return;
 
   await fetch(API + "/delete", {
