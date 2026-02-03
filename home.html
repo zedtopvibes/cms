@@ -1,128 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ZedTopVibes Demo</title>
 <style>
-  * { box-sizing: border-box; max-width: 100%; }
-  body { margin:0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#f6f7f7; color:#1d2327; }
-  a { text-decoration:none; color:inherit; }
-  button { cursor:pointer; font-size:1rem; }
-
-  .topbar { height:48px; background:#2271b1; color:#fff; display:flex; align-items:center; padding:0 1rem; position:fixed; top:0; left:0; right:0; z-index:1000; }
-  .topbar .title { font-weight:600; font-size:1rem; }
-
-  .sidebar { width:220px; background:#1d2327; color:#fff; position:fixed; top:48px; bottom:0; left:0; padding:1rem 0; overflow-y:auto; }
-  .sidebar nav a { display:block; padding:0.6rem 1.2rem; color:#c3c4c7; }
-  .sidebar nav a.active, .sidebar nav a:hover { background:#2271b1; color:#fff; }
-
-  .main { margin-left:220px; padding:1.5rem; padding-top:72px; min-height:100vh; }
-  .page-title { font-size:1.4rem; font-weight:600; margin-bottom:1rem; }
-  .content-panel { background:#fff; border:1px solid #dcdcde; padding:1.5rem; min-height:300px; }
-
-  ul { padding-left:1rem; }
-  li { margin-bottom:0.5rem; }
-  .download-btn { padding:4px 8px; background:#2271b1; color:#fff; border:none; cursor:pointer; border-radius:3px; margin-left:10px; }
-
-  @media (max-width:768px){
-    .sidebar { display:none; }
-    .main { margin-left:0; padding-top:60px; }
-  }
+  body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin:0; background:#f6f7f7; color:#1d2327; }
+  h1,h2,h3 { margin:0.5rem 0; }
+  .container { max-width:1200px; margin:auto; padding:1rem; }
+  .grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); }
+  .card { background:#fff; border:1px solid #dcdcde; border-radius:5px; overflow:hidden; text-align:center; padding:0.5rem; }
+  .card img { width:100%; height:150px; object-fit:cover; }
+  a { text-decoration:none; color:#2271b1; }
+  .section { margin-bottom:2rem; }
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="title">ZedTopVibes Demo</div>
-</header>
+<div class="container">
+  <h1>ZedTopVibes Demo</h1>
 
-<aside class="sidebar">
-  <nav>
-    <a href="#" class="active" onclick="setPage('Home', this)">Home</a>
-    <a href="#" onclick="setPage('Artists', this)">Artists</a>
-    <a href="#" onclick="setPage('Albums', this)">Albums</a>
-    <a href="#" onclick="setPage('Songs', this)">Songs</a>
-  </nav>
-</aside>
-
-<main class="main">
-  <h1 class="page-title" id="pageTitle">Home</h1>
-  <div class="content-panel" id="contentPanel">
-    <p>Welcome to ZedTopVibes Demo! Browse artists, albums, and songs.</p>
+  <div class="section" id="artistsSection">
+    <h2>Artists</h2>
+    <div class="grid" id="artistsGrid"></div>
   </div>
-</main>
+
+  <div class="section" id="albumsSection">
+    <h2>Albums</h2>
+    <div class="grid" id="albumsGrid"></div>
+  </div>
+
+  <div class="section" id="songsSection">
+    <h2>Songs</h2>
+    <div class="grid" id="songsGrid"></div>
+  </div>
+</div>
 
 <script>
-const API_URL = "https://cms.zedtopvibes.workers.dev";
+const API_BASE = "https://cms.zedtopvibes.workers.dev";
 
-// ===== PAGE NAVIGATION =====
-function setPage(title, el){
-  document.getElementById("pageTitle").textContent = title;
-  document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
-  if(el) el.classList.add("active");
-  loadContent(title);
-}
+// Replace this with your actual session token if needed
+const sessionToken = ""; // optional if you allow public demo
 
-// ===== LOAD CONTENT =====
-async function loadContent(page){
-  const panel = document.getElementById("contentPanel");
-  panel.innerHTML = "Loading...";
-
+async function fetchData(endpoint) {
   try {
-    let html = "";
-
-    if(page === "Home"){
-      html = "<p>Welcome to ZedTopVibes Demo! Browse artists, albums, and songs.</p>";
-    }
-
-    else if(page === "Artists"){
-      const res = await fetch(`${API_URL}/artists`, { headers: { Authorization: "Bearer DEMO_TOKEN" } });
-      const data = await res.json();
-      if(!res.ok) throw new Error(data.error || "Failed to fetch artists");
-      html = "<ul>" + data.map(a => `<li>${a.name}</li>`).join("") + "</ul>";
-    }
-
-    else if(page === "Albums"){
-      const res = await fetch(`${API_URL}/albums`, { headers: { Authorization: "Bearer DEMO_TOKEN" } });
-      const data = await res.json();
-      if(!res.ok) throw new Error(data.error || "Failed to fetch albums");
-      html = "<ul>" + data.map(a => `<li>${a.title} (Artist ID: ${a.artistId})</li>`).join("") + "</ul>";
-    }
-
-    else if(page === "Songs"){
-      const res = await fetch(`${API_URL}/songs`, { headers: { Authorization: "Bearer DEMO_TOKEN" } });
-      const data = await res.json();
-      if(!res.ok) throw new Error(data.error || "Failed to fetch songs");
-      html = "<ul>" + data.map(s => 
-        `<li>${s.title} (Artist: ${s.artistId}, Album: ${s.albumId}) 
-        <button class='download-btn' onclick='downloadSong(\"${s.id}\")'>Download</button></li>`).join("") + "</ul>";
-    }
-
-    panel.innerHTML = html;
-  } catch(err){
-    panel.innerHTML = `<p style="color:red;">${err.message}</p>`;
-  }
-}
-
-// ===== DOWNLOAD =====
-async function downloadSong(songId){
-  try {
-    const res = await fetch(`${API_URL}/download`, {
-      method:"POST",
-      headers: { "Content-Type":"application/json", Authorization:"Bearer DEMO_TOKEN" },
-      body: JSON.stringify({ songId })
+    const res = await fetch(API_BASE + endpoint, {
+      headers: sessionToken ? { "Authorization": "Bearer " + sessionToken } : {}
     });
-    const data = await res.json();
-    if(res.ok) alert(`Download count updated: ${data.downloads}`);
-    else alert(data.error || "Download failed");
-  } catch(err){
-    alert(err.message);
+    return await res.json();
+  } catch(err) {
+    console.error("Error fetching", endpoint, err);
+    return [];
   }
 }
 
-// Load home by default
-loadContent("Home");
+async function renderDemo() {
+  const [artists, albums, songs] = await Promise.all([
+    fetchData("/artists"),
+    fetchData("/albums"),
+    fetchData("/songs")
+  ]);
+
+  // ===== Render Artists =====
+  const artistsGrid = document.getElementById("artistsGrid");
+  artists.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<img src="${a.image}" alt="${a.name}" /><h3>${a.name}</h3>`;
+    artistsGrid.appendChild(div);
+  });
+
+  // ===== Render Albums =====
+  const albumsGrid = document.getElementById("albumsGrid");
+  albums.forEach(a => {
+    const artistName = artists.find(ar => ar.id === a.artistId)?.name || "Unknown";
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<img src="${a.cover}" alt="${a.title}" /><h3>${a.title}</h3><p>${artistName}</p>`;
+    albumsGrid.appendChild(div);
+  });
+
+  // ===== Render Songs =====
+  const songsGrid = document.getElementById("songsGrid");
+  songs.forEach(s => {
+    const artistName = artists.find(ar => ar.id === s.artistId)?.name || "Unknown";
+    const albumTitle = albums.find(al => al.id === s.albumId)?.title || "Unknown Album";
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<h3>${s.title}</h3><p>${artistName}</p><p>${albumTitle}</p><audio controls src="${s.url}"></audio>`;
+    songsGrid.appendChild(div);
+  });
+}
+
+// Initialize demo
+renderDemo();
 </script>
 
 </body>
