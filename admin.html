@@ -10,15 +10,7 @@
   a { text-decoration: none; color: inherit; }
   button { background: none; border: none; cursor: pointer; font-size: 1rem; }
 
-  /* LOGIN FORM */
-  #loginForm { max-width: 320px; margin: 100px auto; padding: 20px; background:#fff; border:1px solid #dcdcde; border-radius:5px; display:block; }
-  #loginForm input { display:block; width:100%; padding:8px; margin:10px 0; }
-  #loginForm button { padding:8px 12px; width:100%; background:#2271b1; color:#fff; border:none; cursor:pointer; }
-  #status { text-align:center; margin-top:10px; }
-  #status.error { color:red; }
-
-  /* DASHBOARD */
-  .topbar { height: 48px; background: #fff; border-bottom:1px solid #dcdcde; display:flex; align-items:center; justify-content:space-between; padding:0 1rem; position:fixed; top:0; left:0; right:0; z-index:1000; display:none; }
+  .topbar { height: 48px; background: #fff; border-bottom:1px solid #dcdcde; display:flex; align-items:center; justify-content:space-between; padding:0 1rem; position:fixed; top:0; left:0; right:0; z-index:1000; }
   .topbar .left { display:flex; align-items:center; gap:0.75rem; }
   .topbar .title { font-weight:600; font-size:0.95rem; }
   .menu-toggle { display:none; }
@@ -28,9 +20,15 @@
   .sidebar nav a.active, .sidebar nav a:hover { background:#2271b1; color:#fff; }
   .sidebar .dropdown a { padding-left:1.5rem; font-size:0.85rem; }
 
-  .main { margin-left:220px; padding:1.5rem; padding-top:72px; min-height:100vh; display:none; }
+  .main { margin-left:0; padding:1.5rem; padding-top:72px; min-height:100vh; display:none; }
   .page-title { font-size:1.4rem; font-weight:600; margin-bottom:1rem; }
   .content-panel { background:#fff; border:1px solid #dcdcde; padding:1.5rem; min-height:300px; }
+
+  @media (min-width:769px){
+    .sidebar { display:block; }
+    .main { margin-left:220px; }
+    .menu-toggle { display:none; }
+  }
 
   @media (max-width:768px){
     .menu-toggle { display:inline-block; font-size:1.2rem; }
@@ -46,31 +44,42 @@
   body.dark-mode .sidebar nav a { color: #ccc; }
   body.dark-mode .sidebar nav a.active, body.dark-mode .sidebar nav a:hover { background: #337ab7; color:#fff; }
   body.dark-mode .main .content-panel { background: #1e1e1e; border: 1px solid #333; }
+
+  /* Login form */
+  #loginContainer { max-width: 400px; margin: 100px auto; padding: 20px; background: #fff; border: 1px solid #dcdcde; border-radius: 6px; }
+  #loginContainer input { width: 100%; margin: 10px 0; padding: 8px; }
+  #loginContainer button { width: 100%; padding: 8px; }
+  #loginContainer label { font-size: 0.9rem; }
+  #loginStatus { margin-top: 10px; font-size: 0.9rem; }
+  #loginStatus.error { color: red; }
+  #loginStatus.success { color: green; }
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<form id="loginForm">
+<div id="loginContainer">
   <h2>Admin Login</h2>
-  <input type="text" name="username" placeholder="Username" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="button" id="loginBtn">Login</button>
-  <div id="status"></div>
-</form>
+  <input type="text" id="username" placeholder="Username" required />
+  <input type="password" id="password" placeholder="Password" required />
+  <label><input type="checkbox" id="rememberMe" /> Remember Me</label>
+  <button id="loginBtn">Login</button>
+  <div id="loginStatus"></div>
+</div>
 
-<!-- DASHBOARD -->
-<header class="topbar" id="topbar">
+<!-- TOP BAR -->
+<header class="topbar">
   <div class="left">
     <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
     <div class="title">CMS Dashboard</div>
   </div>
   <div class="right">
     <button id="themeToggleBtn">🌙</button>
-    <button onclick="logout()">Logout</button>
+    <button id="logoutBtn">Logout</button>
   </div>
 </header>
 
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <nav>
     <a href="#" class="active" onclick="setPage('Home', this)">Home</a>
@@ -92,91 +101,124 @@
   </nav>
 </aside>
 
-<main class="main" id="main">
+<!-- MAIN CONTENT -->
+<main class="main">
   <h1 class="page-title" id="pageTitle">Home</h1>
   <div class="content-panel">
-    <div id="panel-Home"><p>Welcome to the CMS Dashboard!</p></div>
-    <div id="panel-Posts" style="display:none;"><p>All Posts placeholder.</p></div>
-    <div id="panel-CreatePost" style="display:none;"><p>Create Post placeholder.</p></div>
-    <div id="panel-Albums" style="display:none;"><p>All Albums placeholder.</p></div>
-    <div id="panel-CreateAlbum" style="display:none;"><p>Create Album placeholder.</p></div>
-    <div id="panel-Artists" style="display:none;"><p>All Artists placeholder.</p></div>
-    <div id="panel-CreateArtist" style="display:none;"><p>Create Artist placeholder.</p></div>
+    <div id="panel-Home">
+      <p>Welcome to the CMS Dashboard!</p>
+    </div>
+    <div id="panel-Posts" style="display:none;">
+      <p>All Posts placeholder.</p>
+    </div>
+    <div id="panel-CreatePost" style="display:none;">
+      <p>Create Post placeholder.</p>
+    </div>
+    <div id="panel-Albums" style="display:none;">
+      <p>All Albums placeholder.</p>
+    </div>
+    <div id="panel-CreateAlbum" style="display:none;">
+      <p>Create Album placeholder.</p>
+    </div>
+    <div id="panel-Artists" style="display:none;">
+      <p>All Artists placeholder.</p>
+    </div>
+    <div id="panel-CreateArtist" style="display:none;">
+      <p>Create Artist placeholder.</p>
+    </div>
   </div>
 </main>
 
 <script>
-const API_URL = "https://cms.zedtopvibes.workers.dev/login"; // your login API
+const API_URL = "https://cms.zedtopvibes.workers.dev/login";
 let token = localStorage.getItem("sessionToken") || "";
 
-// ===== Check login on page load =====
+// Elements
+const loginContainer = document.getElementById("loginContainer");
+const mainContent = document.querySelector(".main");
+const sidebar = document.getElementById("sidebar");
+const loginStatus = document.getElementById("loginStatus");
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const rememberMeInput = document.getElementById("rememberMe");
+
+// ===== Auto-login if token exists =====
 window.addEventListener("DOMContentLoaded", () => {
-  if(token) {
+  if(token){
     showDashboard();
   }
 });
 
+// ===== Show Dashboard =====
 function showDashboard(){
-  document.querySelector(".topbar .right button[onclick]").style.display = "inline-block"; // show logout
-  document.getElementById("sidebar").style.display = "block"; // ensure sidebar visible
-  document.querySelector(".main").style.display = "block"; // show main content
+  loginContainer.style.display = "none";
+  sidebar.style.display = "block";
+  mainContent.style.display = "block";
 }
 
-// ===== Login Function =====
-async function login(username, password){
+// ===== Login Button =====
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
+  loginStatus.textContent = "Logging in...";
+  loginStatus.className = "";
+
   try {
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {"Content-Type": "application/json"},
       body: JSON.stringify({ username, password })
     });
-
     const result = await res.json();
+
     if(result.success){
       token = result.token;
-      localStorage.setItem("sessionToken", token);
+      if(rememberMeInput.checked){
+        localStorage.setItem("sessionToken", token);
+      }
+      loginStatus.textContent = "Login successful!";
+      loginStatus.className = "success";
       showDashboard();
-      alert("Login successful!");
     } else {
-      alert("Login failed: " + result.message);
+      loginStatus.textContent = "Login failed: " + result.message;
+      loginStatus.className = "error";
     }
   } catch(err){
-    alert("Login error: " + err.message);
+    loginStatus.textContent = "Login error: " + err.message;
+    loginStatus.className = "error";
   }
-}
+});
 
-// ===== Logout Function =====
-function logout(){
+// ===== Logout =====
+document.getElementById("logoutBtn").addEventListener("click", () => {
   token = "";
   localStorage.removeItem("sessionToken");
-  document.querySelector(".main").style.display = "none"; 
-  document.getElementById("sidebar").style.display = "none"; 
-  alert("Logged out successfully.");
-}
+  loginContainer.style.display = "block";
+  sidebar.style.display = "none";
+  mainContent.style.display = "none";
+  loginStatus.textContent = "";
+  usernameInput.value = "";
+  passwordInput.value = "";
+  rememberMeInput.checked = false;
+});
 
-// ===== Sidebar & Page Functions =====
-function toggleSidebar() { 
-  document.getElementById("sidebar").classList.toggle("open"); 
-}  
-
+// ===== Sidebar / Theme / Pages =====
+function toggleSidebar(){ sidebar.classList.toggle("open"); }
 function toggleDropdown(id){ 
   const el = document.getElementById(id); 
   el.style.display = el.style.display === 'none' ? 'block' : 'none'; 
-}  
-
+}
 function setPage(title, el){  
   document.getElementById("pageTitle").textContent = title;  
   if(el){
     document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
     el.classList.add("active");
   }
-  document.getElementById("sidebar").classList.remove("open");  
+  sidebar.classList.remove("open");  
   document.querySelectorAll('.content-panel > div').forEach(panel => panel.style.display = 'none');  
   const panel = document.getElementById('panel-' + title);
   if(panel) panel.style.display = 'block';  
 }
-
-// ===== Theme Toggle =====
 document.getElementById('themeToggleBtn').onclick = () => document.body.classList.toggle('dark-mode');
 </script>
 
