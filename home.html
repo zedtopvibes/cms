@@ -143,8 +143,10 @@ button.danger {
 
 <div class="container">
 
-  <!-- Upload Card -->
+  <!-- MAIN WRAPPER CARD -->
   <div class="card">
+
+    <!-- Upload Section -->
     <label class="upload-box">
       <input
         type="file"
@@ -156,12 +158,11 @@ button.danger {
       <button>Select Files</button>
     </label>
     <div id="error" class="error"></div>
-  </div>
 
-  <!-- File List -->
-  <div class="card">
-    <h3>Uploaded Files</h3>
+    <!-- File List Section -->
+    <h3 style="margin-top:24px;">Uploaded Files</h3>
     <div id="list"></div>
+
   </div>
 
 </div>
@@ -234,6 +235,7 @@ fileInput.onchange = () => {
 
   const uploadCard = document.createElement("div");
   uploadCard.className = "card";
+  uploadCard.style.marginTop = "16px";
   uploadCard.innerHTML = "<h3>Uploading files…</h3>";
   document.querySelector(".container").prepend(uploadCard);
 
@@ -280,8 +282,6 @@ function uploadFile(file, container) {
     bar.style.width = "100%";
     text.textContent = "Completed";
     setTimeout(() => item.remove(), 1200);
-
-    // Reload files after upload
     loadFiles();
   };
 
