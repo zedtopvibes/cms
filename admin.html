@@ -1,132 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMS Dashboard</title>
-<style>
-  * { box-sizing: border-box; max-width: 100%; }
-  body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f6f7f7; color: #1d2327; overflow-x: hidden; }
-  a { text-decoration: none; color: inherit; }
-  button { background: none; border: none; cursor: pointer; font-size: 1rem; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS Dashboard</title>
+  <style>
+    * { box-sizing: border-box; max-width: 100%; }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f6f7f7; color: #1d2327; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    button { background: none; border: none; cursor: pointer; font-size: 1rem; }
 
-  .topbar { height: 48px; background: #fff; border-bottom:1px solid #dcdcde; display:flex; align-items:center; justify-content:space-between; padding:0 1rem; position:fixed; top:0; left:0; right:0; z-index:1000; }
-  .topbar .title { font-weight:600; font-size:0.95rem; }
+    /* Topbar */
+    .topbar { height: 48px; background: #fff; border-bottom:1px solid #dcdcde; display:flex; align-items:center; justify-content:space-between; padding:0 1rem; position:fixed; top:0; left:0; right:0; z-index:1000; }
+    .topbar .left { display:flex; align-items:center; gap:0.75rem; }
+    .topbar .title { font-weight:600; font-size:0.95rem; }
+    .menu-toggle { display:none; }
 
-  .sidebar { width:220px; background:#1d2327; color:#fff; position:fixed; top:48px; bottom:0; left:0; padding:1rem 0; overflow-y:auto; }
-  .sidebar nav a { display:block; padding:0.6rem 1.2rem; font-size:0.9rem; color:#c3c4c7; }
-  .sidebar nav a.active, .sidebar nav a:hover { background:#2271b1; color:#fff; }
-  .sidebar .dropdown a { padding-left:1.5rem; font-size:0.85rem; }
+    /* Sidebar */
+    .sidebar { width:220px; background:#1d2327; color:#fff; position:fixed; top:48px; bottom:0; left:0; padding:1rem 0; overflow-y:auto; }
+    .sidebar nav a { display:block; padding:0.6rem 1.2rem; font-size:0.9rem; color:#c3c4c7; }
+    .sidebar nav a.active, .sidebar nav a:hover { background:#2271b1; color:#fff; }
+    .sidebar .dropdown a { padding-left:1.5rem; font-size:0.85rem; }
 
-  .main { margin-left:220px; padding:1.5rem; padding-top:72px; min-height:100vh; }
-  .page-title { font-size:1.4rem; font-weight:600; margin-bottom:1rem; }
-  .content-panel { background:#fff; border:1px solid #dcdcde; padding:1.5rem; min-height:300px; }
+    /* Main content */
+    .main { margin-left:220px; padding:1.5rem; padding-top:72px; min-height:100vh; }
+    .page-title { font-size:1.4rem; font-weight:600; margin-bottom:1rem; }
+    .content-panel { background:#fff; border:1px solid #dcdcde; padding:1.5rem; min-height:300px; }
 
-  ul.file-tree { list-style: none; padding-left: 1rem; }
-  ul.file-tree li { margin: 4px 0; cursor: pointer; }
-  ul.file-tree li.folder::before { content: "📁 "; }
-  ul.file-tree li.file::before { content: "📄 "; }
-  ul.file-tree li > ul { display: none; padding-left: 1.5rem; }
+    /* File tree */
+    .file-tree { list-style:none; padding-left:0; }
+    .file-tree li.folder { font-weight:600; cursor:pointer; }
+    .file-tree li.file { margin-left:1rem; }
 
-  body.dark-mode { background: #121212; color: #f0f0f0; }
-  body.dark-mode .sidebar { background: #1b1b1b; }
-  body.dark-mode .main .content-panel { background: #1e1e1e; border: 1px solid #333; }
-</style>
+    @media (max-width:768px){
+      .menu-toggle { display:inline-block; font-size:1.2rem; }
+      .sidebar { transform:translateX(-100%); transition:transform 0.25s ease; z-index:999; }
+      .sidebar.open { transform:translateX(0); }
+      .main { margin-left:0; padding:1rem; padding-top:64px; }
+    }
+
+    /* Dark mode */
+    body.dark-mode { background: #121212; color: #f0f0f0; }
+    body.dark-mode .topbar { background: #1e1e1e; border-bottom: 1px solid #333; }
+    body.dark-mode .sidebar { background: #1b1b1b; color: #ddd; }
+    body.dark-mode .sidebar nav a { color: #ccc; }
+    body.dark-mode .sidebar nav a.active, body.dark-mode .sidebar nav a:hover { background: #337ab7; color:#fff; }
+    body.dark-mode .main .content-panel { background: #1e1e1e; border: 1px solid #333; }
+  </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="title">CMS Dashboard</div>
-  <button id="themeToggleBtn">🌙</button>
-</header>
-
-<aside class="sidebar" id="sidebar">
-  <nav>
-    <a href="#" class="active" onclick="setPage('Home', this)">Home</a>
-    <a href="#" onclick="setPage('Files', this)">Files ▾</a>
-    <a href="#" onclick="setPage('UploadFile', this)">Upload File ▾</a>
-  </nav>
-</aside>
-
-<main class="main">
-  <h1 class="page-title" id="pageTitle">Home</h1>
-  <div class="content-panel">
-    <div id="panel-Home">
-      <p>Welcome to the CMS Dashboard!</p>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="title">CMS Dashboard</div>
     </div>
-
-    <div id="panel-Files" style="display:none;">
-      <p>All Files in <b>media</b> bucket:</p>
-      <ul id="fileList" class="file-tree"></ul>
+    <div class="right">
+      <button id="themeToggleBtn">🌙</button>
+      <button onclick="alert('Logout clicked')">Logout</button>
     </div>
+  </header>
 
-    <div id="panel-UploadFile" style="display:none;">
-      <input type="file" id="fileInput" multiple />
-      <button onclick="uploadFile()">Upload File(s)</button>
-      <div id="uploadStatus"></div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <nav>
+      <a href="#" class="active" onclick="setPage('Home', this)">Home</a>
+
+      <a href="#" onclick="toggleDropdown('postsDropdown')">Posts ▾</a>
+      <div id="postsDropdown" class="dropdown" style="display:none;">
+        <a href="#" onclick="setPage('Posts', this)">All Posts</a>
+        <a href="#" onclick="setPage('CreatePost', this)">Create Post</a>
+      </div>
+
+      <a href="#" onclick="toggleDropdown('albumsDropdown')">Albums ▾</a>
+      <div id="albumsDropdown" class="dropdown" style="display:none;">
+        <a href="#" onclick="setPage('Albums', this)">All Albums</a>
+        <a href="#" onclick="setPage('CreateAlbum', this)">Create Album</a>
+      </div>
+
+      <a href="#" onclick="toggleDropdown('artistsDropdown')">Artists ▾</a>
+      <div id="artistsDropdown" class="dropdown" style="display:none;">
+        <a href="#" onclick="setPage('Artists', this)">All Artists</a>
+        <a href="#" onclick="setPage('CreateArtist', this)">Create Artist</a>
+      </div>
+
+      <!-- FILES SECTION -->
+      <a href="#" onclick="setPage('Files', this)">Files</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <h1 class="page-title" id="pageTitle">Home</h1>
+    <div class="content-panel">
+
+      <div id="panel-Home">
+        <p>Welcome to the CMS Dashboard!</p>
+      </div>
+
+      <div id="panel-Posts" style="display:none;"><p>All Posts placeholder.</p></div>
+      <div id="panel-CreatePost" style="display:none;"><p>Create Post placeholder.</p></div>
+
+      <div id="panel-Albums" style="display:none;"><p>All Albums placeholder.</p></div>
+      <div id="panel-CreateAlbum" style="display:none;"><p>Create Album placeholder.</p></div>
+
+      <div id="panel-Artists" style="display:none;"><p>All Artists placeholder.</p></div>
+      <div id="panel-CreateArtist" style="display:none;"><p>Create Artist placeholder.</p></div>
+
+      <!-- FILES PANEL -->
+      <div id="panel-Files" style="display:none;">
+        <p>All files in your <b>media</b> bucket:</p>
+        <ul id="fileList" class="file-tree"></ul>
+        <input type="file" id="fileInput" multiple />
+        <button onclick="uploadFile()">Upload File(s)</button>
+        <div id="uploadStatus"></div>
+      </div>
+
     </div>
-  </div>
-</main>
+  </main>
 
-<script>
-const API_BASE = "https://cms.zedtopvibes.workers.dev";
+  <script>
+    const API_BASE = "https://cms.zedtopvibes.workers.dev";
 
-// ===== Page Switching =====
-function setPage(title, el){
-  document.getElementById("pageTitle").textContent = title;  
-  document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
-  if(el) el.classList.add("active");
+    // ===== Sidebar & Page =====
+    function toggleSidebar() { document.getElementById("sidebar").classList.toggle("open"); }
 
-  document.querySelectorAll('.content-panel > div').forEach(panel => panel.style.display = 'none');  
-  const panel = document.getElementById('panel-' + title);
-  if(panel) panel.style.display = 'block';
-
-  if(title==="Files") fetchFiles();
-}
-
-// ===== Theme Toggle =====
-document.getElementById('themeToggleBtn').onclick = () => document.body.classList.toggle('dark-mode');
-
-// ===== R2 File Manager =====
-async function fetchFiles() {
-  const res = await fetch(API_BASE + "/api/list");
-  const files = await res.json();
-
-  const list = document.getElementById("fileList");
-  list.innerHTML = "";
-
-  files.forEach(f => {
-    const li = document.createElement("li");
-    li.textContent = f.key;
-    li.classList.add(f.key.endsWith("/") ? "folder" : "file");
-    if(f.key.endsWith("/")) {
-      li.addEventListener("click", e => e.stopPropagation());
+    function toggleDropdown(id){ 
+      const el = document.getElementById(id); 
+      el.style.display = el.style.display === 'none' ? 'block' : 'none'; 
     }
-    list.appendChild(li);
-  });
-}
 
-async function uploadFile() {
-  const input = document.getElementById("fileInput");
-  const status = document.getElementById("uploadStatus");
-  if(input.files.length===0) return status.innerText="No files selected";
+    function setPage(title, el){
+      document.getElementById("pageTitle").textContent = title;
+      if(el){
+        document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+        el.classList.add("active");
+      }
+      document.getElementById("sidebar").classList.remove("open");
+      document.querySelectorAll('.content-panel > div').forEach(panel => panel.style.display = 'none');
+      const panel = document.getElementById('panel-' + title);
+      if(panel) panel.style.display = 'block';
 
-  for(let file of input.files){
-    // Get signed URL from Worker
-    const res = await fetch(API_BASE + "/api/upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: file.name })
-    });
-    const { url } = await res.json();
+      if(title==="Files") fetchFiles();
+    }
 
-    // Upload file directly to R2
-    await fetch(url, { method:"PUT", body:file });
-  }
-  status.innerText = "Files uploaded!";
-  fetchFiles();
-}
-</script>
+    // ===== Theme Toggle =====
+    document.getElementById('themeToggleBtn').onclick = () => document.body.classList.toggle('dark-mode');
+
+    // ===== R2 File Manager =====
+    async function fetchFiles() {
+      const res = await fetch(API_BASE + "/api/list");
+      const files = await res.json();
+
+      const list = document.getElementById("fileList");
+      list.innerHTML = "";
+
+      files.forEach(f => {
+        const li = document.createElement("li");
+        li.textContent = f.key;
+        li.classList.add(f.key.endsWith("/") ? "folder" : "file");
+        list.appendChild(li);
+      });
+    }
+
+    async function uploadFile() {
+      const input = document.getElementById("fileInput");
+      const status = document.getElementById("uploadStatus");
+      if(input.files.length===0) return status.innerText="No files selected";
+
+      for(let file of input.files){
+        // Get signed URL from Worker
+        const res = await fetch(API_BASE + "/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name })
+        });
+        const { url } = await res.json();
+
+        // Upload file directly to R2
+        await fetch(url, { method:"PUT", body:file });
+      }
+
+      status.innerText = "Files uploaded!";
+      fetchFiles();
+    }
+  </script>
 
 </body>
 </html>
