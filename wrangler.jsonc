@@ -1,5 +1,5 @@
 {
-  "name": "cms-worker",
+  "name": "cms-admin",
   "compatibility_date": "2026-01-28",
   "assets": {
     "directory": "./"
