@@ -15,9 +15,7 @@
   --border: #1f2937;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -130,6 +128,12 @@ button.danger {
 .upload-item small {
   opacity: 0.7;
 }
+
+.error {
+  color: var(--danger);
+  margin-top: 8px;
+  font-size: 14px;
+}
 </style>
 </head>
 
@@ -142,11 +146,16 @@ button.danger {
   <!-- Upload Card -->
   <div class="card">
     <label class="upload-box">
-      <input type="file" id="files" multiple
-  accept="*/*">
+      <input
+        type="file"
+        id="files"
+        multiple
+        accept=".jpg,.png,.pdf,.zip,.mp4,.mp3"
+      >
       <p>Drag & drop files here<br>or click to select</p>
       <button>Select Files</button>
     </label>
+    <div id="error" class="error"></div>
   </div>
 
   <!-- File List -->
@@ -159,9 +168,11 @@ button.danger {
 
 <script>
 const API = "https://cms.zedtopvibes.workers.dev";
+const ALLOWED_EXT = ["jpg","png","pdf","zip","mp4","mp3"];
 
 const listEl = document.getElementById("list");
 const fileInput = document.getElementById("files");
+const errorBox = document.getElementById("error");
 
 /* =========================
    LOAD FILES
@@ -197,9 +208,18 @@ async function loadFiles() {
 }
 
 /* =========================
+   FILE VALIDATION
+========================= */
+function isAllowed(file) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  return ALLOWED_EXT.includes(ext);
+}
+
+/* =========================
    UPLOAD WITH PER-FILE PROGRESS
 ========================= */
 fileInput.onchange = () => {
+  errorBox.textContent = "";
   const files = [...fileInput.files];
   if (!files.length) return;
 
@@ -208,7 +228,15 @@ fileInput.onchange = () => {
   uploadCard.innerHTML = "<h3>Uploading files…</h3>";
   document.querySelector(".container").prepend(uploadCard);
 
-  files.forEach(file => uploadFile(file, uploadCard));
+  files.forEach(file => {
+    if (!isAllowed(file)) {
+      errorBox.textContent =
+        "Only JPG, PNG, PDF, ZIP, MP4 and MP3 files are allowed.";
+      return;
+    }
+    uploadFile(file, uploadCard);
+  });
+
   fileInput.value = "";
 };
 
